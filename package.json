@@ -1,0 +1,47 @@
+{
+	"name": "@getify/eslint-plugin-proper-arrows",
+	"version": "0.0.1",
+	"description": "ESLint rules to ensure proper arrow function definitions",
+	"main": "./lib/index.js",
+	"scripts": {
+		"test": "node scripts/node-tests.js",
+		"test:dist": "TEST_DIST=true npm test",
+		"test:package": "TEST_PACKAGE=true npm test",
+		"test:all": "npm test && npm run test:dist && npm run test:package",
+		"coverage": "istanbul cover scripts/node-tests.js",
+		"coverage:report": "npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+		"build-core": "node scripts/build-core.js",
+		"build": "npm run build-core",
+		"prepare": "npm run build",
+		"prepublish": "npm run build && npm run test:all",
+		"publish": "npm run coverage:report"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"coveralls": "~3.0.2",
+		"eslint": "~5.15.0",
+		"qunit": "~2.9.1",
+		"terser": "~3.16.1"
+	},
+	"peerDependencies": {
+		"eslint": ">= 5.0"
+	},
+	"repository": "getify/eslint-plugin-proper-arrows",
+	"keywords": [
+		"eslint",
+		"plugin",
+		"eslintplugin",
+		"rule",
+		"arrow",
+		"name inference",
+		"concise object return",
+		"this"
+	],
+	"bugs": {
+		"url": "https://github.com/getify/eslint-plugin-proper-arrows/issues",
+		"email": "getify@gmail.com"
+	},
+	"homepage": "https://github.com/getify/eslint-plugin-proper-arrows",
+	"author": "Kyle Simpson <getify@gmail.com>",
+	"license": "MIT"
+}
