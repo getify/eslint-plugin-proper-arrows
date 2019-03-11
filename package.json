@@ -21,7 +21,7 @@
 		"coveralls": "~3.0.2",
 		"eslint": "~5.15.0",
 		"qunit": "~2.9.1",
-		"terser": "~3.16.1"
+		"terser": "~3.17.0"
 	},
 	"peerDependencies": {
 		"eslint": ">= 5.0"
