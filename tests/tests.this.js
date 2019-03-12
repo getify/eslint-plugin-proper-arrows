@@ -219,6 +219,20 @@ QUnit.test( "THIS: property arrow, this (always + no-global)", function test(ass
 	assert.strictEqual( messageId, "noGlobal", "messageId" );
 } );
 
+QUnit.test( "THIS: outer arrow, this (always + no-global + node/commonjs)", function test(assert){
+	var code = `
+		var x = y => this.foo(y);
+	`;
+
+	var results = eslinter.verify( code, thisAlwaysNoGlobalNodeCommonJSOptions );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "noGlobal", "messageId" );
+} );
+
 
 // **********************************************
 

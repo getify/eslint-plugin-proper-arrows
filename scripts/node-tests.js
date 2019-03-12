@@ -44,6 +44,10 @@ global.thisAlwaysNoGlobalOptions = {
 	parserOptions: { ecmaVersion: 2015, },
 	rules: { "@getify/proper-arrows/this": ["error","always","no-global",], },
 };
+global.thisAlwaysNoGlobalNodeCommonJSOptions = {
+	parserOptions: { ecmaVersion: 2015, ecmaFeatures: { globalReturn: true, }, },
+	rules: { "@getify/proper-arrows/this": ["error","always","no-global",], },
+};
 global.thisNestedNoGlobalOptions = {
 	parserOptions: { ecmaVersion: 2015, },
 	rules: { "@getify/proper-arrows/this": ["error","nested","no-global",], },
