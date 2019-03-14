@@ -12,6 +12,8 @@ The **proper-arrows** ESLint Plugin defines rules that control the definitions o
 
 The rules defined in this plugin:
 
+* [`"params"`](#rule-params): controls definitions of `=>` arrow function parameters, such as forbidding unused parameters, forbidding short/unsemantic parameter names, etc.
+
 * [`"name"`](#rule-name): requires `=>` arrow functions to only be used in positions where they receive an inferred name (i.e., assigned to a variable or property, etc), to avoid the poor readbility/debuggability of anonymous function expressions.
 
    **Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
@@ -111,6 +113,10 @@ eslinter.verify(".. some code ..",{
 Once the plugin is loaded, the rule can be configured using inline code comments if desired, such as:
 
 ```js
+/* eslint "@getify/proper-arrows/params": ["error",{"unused": "all"}] */
+```
+
+```js
 /* eslint "@getify/proper-arrows/name": "error" */
 ```
 
@@ -122,13 +128,213 @@ Once the plugin is loaded, the rule can be configured using inline code comments
 /* eslint "@getify/proper-arrows/this": ["error","always"] */
 ```
 
+## Rule: `"params"`
+
+The **proper-arrows**/*params* rule controls definitions of parameters for `=>` arrow functions.
+
+This rule can be configured to forbid unused parameter names (`"unused"`), limit the number of parameters (`"count"`), and require parameter names to be at least a certain length (`"length"`). Also, this rule can specify a list of exceptions to always allow certain parameter names (`"allow"`).
+
+To turn this rule on:
+
+```json
+"@getify/proper-arrows/params": "error"
+```
+
+```json
+"@getify/proper-arrows/params": [ "error", { "unused": true, "count": 3, "length": 4, "allow": [ "e", "err" ] } ]
+```
+
+The main purpose of this rule is to prevent readability harm for `=>` arrow functions by ensuring the parameters are clean and "proper".
+
+By forbidding unused parameters, the reader is not confused searching for their usage. By requiring parameters that are long enough to be meaningful names, the reader understands the function better. By limiting the number of parameters, the reader is more easily able to visually distinguish the whole function definition.
+
+For example:
+
+```js
+var fn = (data,user) => ajax(user.id,data);
+```
+
+In this snippet, the `=>` arrow function has two parameters, and both are 4 characters long and used in the function body. Therefore, the **proper-arrows**/*this* rule would not report any errors.
+
+By contrast, this rule *would* report errors for:
+
+```js
+var fn = (d,u,m,b) => ajax(u.id,d);
+```
+
+Here, the `=>` arrow function has 4 parameters (too many!), each one is a single character (too short!), and two of them are unused.
+
+### Rule Configuration
+
+The **proper-arrows**/*params* rule can be configured with any combination of three modes: `"unused"`, `"count"`, and `"length"`. Also, parameter names can be explicitly allowed by name (thus not reporting any error for these modes) in the `"allowed"` setting.
+
+**Note:** The default behavior is that all three modes are turned on. You must specifically configure each mode to (effectively) disable it.
+
+* [`"unused"`](#rule-params-configuration-unused) (default: `"all"`) prevents parameter names that are not used in the function. Can also be set to `"trailing"` to only report errors for trailing parameters -- that is, only those which are unused that come after the last parameter that is used -- or `"none"` to disable this mode.
+
+* [`"count"`](#rule-params-configuration-count) (default: `3`) is the maximum count for parameters on an `=>` arrow function. All parameters are counted to check against the limit, including any `"allowed"` parameters and the "...rest" parameter. Set to a larger number to effectively disable this mode.
+
+* [`"length"`](#rule-params-configuration-length) (default: `2`) is the minimum length of allowed parameter names. Set to `0` to effectively disable this mode.
+
+* [`"allowed"`](#rule-params-configuration-allowed) (default: `[]`) is a list of parameter names to ignore and not report any errors for.
+
+#### Rule `"params"` Configuration: `"unused"`
+
+**Note:** This "unused" rule mode resembles the [built-in "no-unused-vars" rule](https://eslint.org/docs/rules/no-unused-vars), but instead focuses only on the parameters of `=>` arrow functions.
+
+To configure this rule mode (default: `"all"`):
+
+```json
+"@getify/proper-arrows/params": "error"
+```
+
+```json
+"@getify/proper-arrows/params": [ "error", { "unused": "all" } ]
+```
+
+The `"unused": "all"` (default) mode checks each parameter to see if it's used anywhere within the function. If not, the parameter is reported as an error.
+
+For example:
+
+```js
+var fn1 = (one,two) => one + two;
+
+var fn2 = (one,two = one) => two * 2;
+
+var fn3 = one => two => three => one * two * three;
+```
+
+These statements all report no errors, because all parameters are used somewhere in each function.
+
+By contrast, this rule *would* report errors for:
+
+```js
+var fn1 = (one,two) => one * 2;
+
+var fn2 = (one,...rest) => one * 2;
+
+var fn3 = one => two => three => one * three;
+```
+
+In each statement, a parameter is defined in an `=>` arrow function that is not used within.
+
+##### `"unused": "trailing"`
+
+It is sometimes desired to name some positional parameters that are effectively ignored by the function body, while using other named parameters that come after. As such, it can be helpful to suppress reports except on unused parameters that come after the last used parameter in the function signature.
+
+In the `"unused": "trailing"` mode, only unused parameters that come positionally after the last used parameter are reported:
+
+```js
+var fn1 = (one,two,three) => two * 2;
+```
+
+In this snippet, since `two` is the last used parameter, only `three` would be reported as an unused parameter (ignores `one`).
+
+##### `"unused": "none"`
+
+Disables this `"unused"` mode; no checks are made for any unused parameters.
+
+#### Rule `"params"` Configuration: `"count"`
+
+To configure this rule mode (default: `3`):
+
+```json
+"@getify/proper-arrows/params": "error"
+```
+
+```json
+"@getify/proper-arrows/params": [ "error", { "count": 3 } ]
+```
+
+This rule mode counts all parameters to make sure the maximum `count` limit is not violated.
+
+For example:
+
+```js
+var fn0 = () => "";
+
+var fn1 = one => one;
+
+var fn2 = (one,two) => one + two;
+
+var fn3 = (one,two,three) => one * two * three;
+
+var fn3b = (one,two,...three) => one * two * three[0];
+```
+
+These statements all report no errors, because all parameter counts are below the limit (default: `3`).
+
+By contrast, this rule *would* report errors for:
+
+```js
+var fn4 = (one,two,three,four) => one + two * three / four;
+
+var fn4b = (one,two,three,...four) => one + two * three / four[0];
+```
+
+In each statement, the parameter count is is above the limit.
+
+#### Rule `"params"` Configuration: `"length"`
+
+**Note:** This "length" rule mode resembles the [built-in ESLint "id-length" rule](https://eslint.org/docs/rules/id-length), but instead focuses only on the parameters of `=>` arrow functions.
+
+To configure this rule mode (default: `2`):
+
+```json
+"@getify/proper-arrows/params": "error"
+```
+
+```json
+"@getify/proper-arrows/params": [ "error", { "length": 2 } ]
+```
+
+This rule mode checks all parameters to make sure their basic character length is at least the minimum `"length"` threshold.
+
+For example:
+
+```js
+var fn0 = () => 42;
+
+var fn1 = (data) => data.id;
+
+var fn2 = (user,cb) => ajax(user,cb);
+```
+
+These statements all report no errors, because all parameters at least the length threshold specified (default: `2`), and the absence of a parameter is ignored.
+
+By contrast, this rule *would* report errors for:
+
+```js
+users.map(v => v * 2);
+```
+
+In this statement, the parameter length is below the minimum threshold.
+
+#### Rule `"params"` Configuration: `"allowed"`
+
+To configure this rule mode (default: `[]`):
+
+```json
+"@getify/proper-arrows/params": [ "error", { "allowed": [ "e", "err" ] } ]
+```
+
+This exception list prevents any named parameter from being reported as an error by any of this **proper-arrows**/*params* rule's modes.
+
+For example:
+
+```js
+var fn = (one,two,three,e) => 0;
+```
+
+Normally, `e` would hit all 3 errors: it's unused, it's beyond the default count limit, and it's below the minimum length threshold. However, no errors will be reported if `"e"` is included in the `"allowed"` exception list.
+
 ## Rule: `"name"`
 
 The **proper-arrows**/*name* rule requires `=>` arrow functions to be in a position where they will receive an inferred name, such as from being assigned to a variable or property.
 
 To turn this rule on:
 
-```js
+```json
 "@getify/proper-arrows/name": "error"
 ```
 
@@ -179,7 +385,7 @@ getName( fns[1] );         // ""
 getName( v => v * 4 );     // ""
 ```
 
-In this snippet, all three arrow functions are anonymous (no name inference possible).
+In this snippet, all three `=>` arrow functions are anonymous (no name inference possible).
 
 ## Rule: `"object-return"`
 
@@ -187,7 +393,7 @@ The **proper-arrows**/*object-return* rule forbids `=>` arrow functions from ret
 
 To turn this rule on:
 
-```js
+```json
 "@getify/proper-arrows/object-return": "error"
 ```
 
@@ -197,7 +403,7 @@ The main purpose of this rule is to avoid the potential readability confusion of
 
 The **proper-arrows**/*object-return* rule is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
 
-If returning an object literal from an arrow function, use the full-body return form:
+If returning an object literal from an `=>` arrow function, use the full-body return form:
 
 ```js
 var x => { return { x, y }; }
@@ -219,7 +425,7 @@ The **proper-arrows**/*this* rule requires `=>` arrow functions to reference the
 
 To turn this rule on:
 
-```js
+```json
 "@getify/proper-arrows/this": "error"
 ```
 
@@ -242,9 +448,9 @@ var o = {
 o.getData();   // 42
 ```
 
-In this snippet, the `=>` arrow function is inside a normal function and therefore looks up and adopts its `this` (aka, "lexical this") -- which is set to the `o` object by the `o.getData()` call. Therefore, the **arrow-require-this** rule would not report an error.
+In this snippet, the `=>` arrow function is inside a normal function and therefore looks up and adopts its `this` (aka, "lexical this") -- which is set to the `o` object by the `o.getData()` call. Therefore, the **proper-arrows**/*this* rule would not report an error.
 
-By contrast, the **proper-arrows**/*this* rule *would* report an error for:
+By contrast, this rule *would* report an error for:
 
 ```js
 var o = {
@@ -279,15 +485,15 @@ The **proper-arrows**/*this* rule can be configured in three modes: `"nested"` (
 
 To configure this rule mode (default):
 
-```js
+```json
 "@getify/proper-arrows/this": "error"
 ```
 
-```js
+```json
 "@getify/proper-arrows/this": [ "error", "nested" ]
 ```
 
-```js
+```json
 "@getify/proper-arrows/this": [ "error", "nested", "no-global" ]
 ```
 
@@ -351,11 +557,11 @@ var o = {
 
 To configure this rule mode:
 
-```js
+```json
 "@getify/proper-arrows/this": [ "error", "always" ]
 ```
 
-```js
+```json
 "@getify/proper-arrows/this": [ "error", "always", "no-global" ]
 ```
 
@@ -409,7 +615,7 @@ var o = {
 
 To configure this rule mode:
 
-```js
+```json
 "@getify/proper-arrows/this": [ "error", "never" ]
 ```
 
@@ -494,9 +700,9 @@ A comprehensive test suite is included in this repository, as well as the npm pa
 
     Other npm test scripts:
 
-    * `npm run test:dist` will run the test suite against `dist/arrow-name.js` instead of the default of `lib/index.js`.
+    * `npm run test:dist` will run the test suite against `dist/eslint-plugins-proper-arrows.js` instead of the default of `lib/index.js`.
 
-    * `npm run test:package` will run the test suite as if the package had just been installed via npm. This ensures `package.json`:`main` properly references `dist/arrow-name.js` for inclusion.
+    * `npm run test:package` will run the test suite as if the package had just been installed via npm. This ensures `package.json`:`main` properly references `dist/eslint-plugins-proper-arrows.js` for inclusion.
 
     * `npm run test:all` will run all three modes of the test suite.
 

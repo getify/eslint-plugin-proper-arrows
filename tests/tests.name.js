@@ -1,11 +1,18 @@
 "use strict";
 
+var linterOptions = {
+	name: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/name": "error", },
+	},
+};
+
 QUnit.test( "NAME: arrow with variable declaration", function test(assert){
 	var code = `
 		var x = y => y;
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -16,7 +23,7 @@ QUnit.test( "NAME: arrow with variable assignment", function test(assert){
 		x = y => y;
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -27,7 +34,7 @@ QUnit.test( "NAME: arrow with property name", function test(assert){
 		var o = { x: y => y };
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -38,7 +45,7 @@ QUnit.test( "NAME: arrow in default value clause", function test(assert){
 		function x(x = y => y) {}
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -49,7 +56,7 @@ QUnit.test( "NAME: arrow in default module export", function test(assert){
 		export default x => x;
 	`;
 
-	var results = eslinter.verify( code, { ...nameOptions, parserOptions: { ...nameOptions.parserOptions, sourceType: "module", }, }, );
+	var results = eslinter.verify( code, { ...linterOptions.name, parserOptions: { ...linterOptions.name.parserOptions, sourceType: "module", }, }, );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -60,7 +67,7 @@ QUnit.test( "NAME: arrow in expression", function test(assert){
 		var x = 1 + (y => y);
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
@@ -74,7 +81,7 @@ QUnit.test( "NAME: arrow as IIFE", function test(assert){
 		(x => x)(3);
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
@@ -89,7 +96,7 @@ QUnit.test( "NAME: arrows as returns", function test(assert){
 		var z = w => r => r[w];
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 	var [
 		{ ruleId: ruleId1, messageId: messageId1, } = {},
 		{ ruleId: ruleId2, messageId: messageId2, } = {},
@@ -108,7 +115,7 @@ QUnit.test( "NAME: arrow as argument", function test(assert){
 		x(y => y);
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
@@ -122,7 +129,7 @@ QUnit.test( "NAME: arrow in array", function test(assert){
 		var x = [y => y];
 	`;
 
-	var results = eslinter.verify( code, nameOptions );
+	var results = eslinter.verify( code, linterOptions.name );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );

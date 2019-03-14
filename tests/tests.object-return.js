@@ -1,11 +1,18 @@
 "use strict";
 
+var linterOptions = {
+	objectReturn: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/object-return": "error", },
+	},
+};
+
 QUnit.test( "OBJECT-RETURN: arrow with regular return", function test(assert){
 	var code = `
 		var x = y => { return { y }; };
 	`;
 
-	var results = eslinter.verify( code, objectReturnOptions );
+	var results = eslinter.verify( code, linterOptions.objectReturn );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
@@ -16,7 +23,7 @@ QUnit.test( "OBJECT-RETURN: arrow with concise-object return", function test(ass
 		var x = y => ({ y });
 	`;
 
-	var results = eslinter.verify( code, objectReturnOptions );
+	var results = eslinter.verify( code, linterOptions.objectReturn );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
