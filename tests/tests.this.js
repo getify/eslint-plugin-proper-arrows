@@ -15,15 +15,15 @@ var linterOptions = {
 	},
 	thisAlwaysNoGlobal: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","always","no-global",], },
+		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,},], },
 	},
 	thisAlwaysNoGlobalNodeCommonJS: {
 		parserOptions: { ecmaVersion: 2015, ecmaFeatures: { globalReturn: true, }, },
-		rules: { "@getify/proper-arrows/this": ["error","always","no-global",], },
+		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,},], },
 	},
 	thisNestedNoGlobal: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","nested","no-global",], },
+		rules: { "@getify/proper-arrows/this": ["error","nested",{"no-global": true,},], },
 	},
 	thisNever: {
 		parserOptions: { ecmaVersion: 2015, },

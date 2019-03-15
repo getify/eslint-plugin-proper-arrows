@@ -476,13 +476,13 @@ The **proper-arrows**/*this* rule can be configured in three modes: `"nested"` (
 
 * [`"nested"`](#rule-this-configuration-nested) (default) permits a `this` to appear lower in a nested `=>` arrow function (i.e., `x = y => z => this.foo(z)`), as long as there is no non-arrow function boundary crossed.
 
-   Additionally, include the `"no-global"` option to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
+   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
 
 * [`"always"`](#rule-this-configuration-always) is more strict, requiring every single `=>` arrow function to have its own `this` reference.
 
-   Additionally, include the `"no-global"` option to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
+   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
 
-* [`"never"`](#rule-this-configuration-never) is the reverse of the rule, which is that all `=>` arrow functions are forbidden from using `this`.
+* [`"never"`](#rule-this-configuration-never) is the reverse of the rule: all `=>` arrow functions are forbidden from using `this`.
 
 #### Rule `"this"` Configuration: `"nested"`
 
@@ -497,12 +497,12 @@ To configure this rule mode (default):
 ```
 
 ```json
-"@getify/proper-arrows/this": [ "error", "nested", "no-global" ]
+"@getify/proper-arrows/this": [ "error", "nested", { "no-global": true } ]
 ```
 
 This rule mode allows a `this` to appear either in the `=>` arrow function, or nested deeper in a chain of `=>` arrow functions, as long as there is **no non-arrow function boundary crossed in the nesting**.
 
-If the `"no-global"` flag **has not** been set for this mode, these statements will all pass the rule:
+If the `"no-global"` option **has not** been set for this mode, these statements will all pass the rule:
 
 ```js
 var a = b => this.foo(b);
@@ -526,9 +526,9 @@ var h = i => function(j){ this.foo(j); };
 var k = l => function(){ return m => this.foo(m); };
 ```
 
-##### `"no-global"` Flag
+##### `"no-global"` Option
 
-If the `"no-global"` flag **has** been set for this mode, these statements will all pass the rule:
+If the `"no-global"` option **has** been set for this mode, these statements will all pass the rule:
 
 ```js
 function foo() { return a => this.bar(a); }
@@ -540,7 +540,7 @@ function foo(cb = a => this.bar(a)) { .. }
 function foo(cb = a => b => this.bar(a,b)) { .. }
 ```
 
-And these statments will each fail this `"no-global"`-flagged rule:
+And these statments will each fail this `"no-global"` option rule:
 
 ```js
 var foo = a => this.bar(a);
@@ -565,12 +565,12 @@ To configure this rule mode:
 ```
 
 ```json
-"@getify/proper-arrows/this": [ "error", "always", "no-global" ]
+"@getify/proper-arrows/this": [ "error", "always", { "no-global": true } ]
 ```
 
 This rule mode requires a `this` reference to appear in every single `=>` arrow function (e.g., nested `this` is not sufficient).
 
-If the `"no-global"` flag **has not** been set for this mode, these statements will all pass the rule:
+If the `"no-global"` option **has not** been set for this mode, these statements will all pass the rule:
 
 ```js
 var a = b => this.foo(b);
@@ -594,9 +594,9 @@ var i = (j = k => k) => this.foo(j);
 
 **Note:** In each of the above examples, at least one of the `=>` arrow functions does not have its own `this`, hence the mode's rule failure (doesn't consider nested `this`).
 
-##### `"no-global"` Flag
+##### `"no-global"` Option
 
-If the `"no-global"` flag **has** been set for this mode, these statements will all pass the rule:
+If the `"no-global"` option **has** been set for this mode, these statements will all pass the rule:
 
 ```js
 function foo() { return a => this.bar(a); }
@@ -604,7 +604,7 @@ function foo() { return a => this.bar(a); }
 function foo(cb = a => this.bar(a)) { .. }
 ```
 
-And these statements will each fail this `"no-global"`-flagged rule:
+And these statements will each fail this `"no-global"` option rule:
 
 ```js
 var foo = a => this.bar(a);
@@ -644,7 +644,7 @@ var c = d => e => this.foo(e);
 var f = g => foo(h => this.bar(h));
 ```
 
-**Note:** The `"no-global"` option is not defined for this rule mode.
+**Note:** The `"no-global"` option is not applicable and has no effect for this rule mode.
 
 ## npm Package
 
