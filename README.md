@@ -39,9 +39,10 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
     "@getify/proper-arrows"
 ],
 "rules": {
+    "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
     "@getify/proper-arrows/name": "error",
     "@getify/proper-arrows/return": "error",
-    "@getify/proper-arrows/this": ["error","always"]
+    "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
 }
 ```
 
@@ -55,9 +56,10 @@ To load the plugin and enable its rules via a project's `package.json`:
         "@getify/proper-arrows"
     ],
     "rules": {
+        "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
         "@getify/proper-arrows/name": "error",
         "@getify/proper-arrows/return": "error",
-        "@getify/proper-arrows/this": ["error","always"]
+        "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
 }
 ```
@@ -65,6 +67,10 @@ To load the plugin and enable its rules via a project's `package.json`:
 ### ESLint CLI parameters
 
 To load the plugin and enable its rules via ESLint CLI parameters, use `--plugin` and `--rule` flags:
+
+```cmd
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/params: [error,{"unused":"trailing"}]' ..
+```
 
 ```cmd
 eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: error' ..
@@ -75,7 +81,7 @@ eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/return:
 ```
 
 ```cmd
-eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/this: [error,always]' ..
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/this: [error,always,{"no-global":true}]' ..
 ```
 
 ### ESLint Node API
@@ -103,10 +109,10 @@ Then lint some code like this:
 ```js
 eslinter.verify(".. some code ..",{
     rules: {
-        "@getify/proper-arrows/params": "error",
+        "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
         "@getify/proper-arrows/name": "error",
         "@getify/proper-arrows/return": "error",
-        "@getify/proper-arrows/this": ["error","always"]
+        "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
 });
 ```
@@ -116,7 +122,7 @@ eslinter.verify(".. some code ..",{
 Once the plugin is loaded, the rule can be configured using inline code comments if desired, such as:
 
 ```js
-/* eslint "@getify/proper-arrows/params": ["error",{"unused": "all"}] */
+/* eslint "@getify/proper-arrows/params": ["error",{"unused":"trailing"}] */
 ```
 
 ```js
@@ -128,7 +134,7 @@ Once the plugin is loaded, the rule can be configured using inline code comments
 ```
 
 ```js
-/* eslint "@getify/proper-arrows/this": ["error","always"] */
+/* eslint "@getify/proper-arrows/this": ["error","always",{"no-global":true}] */
 ```
 
 ## Rule: `"params"`
