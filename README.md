@@ -18,13 +18,11 @@ The rules defined in this plugin:
 
    **Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
 
-* [`"return"`](#rule-return): forbids `=>` arrow functions from returning objects in the concise-expression-body form, such as `x => ({ x })`.
-
-   **Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode, but differs a bit.
+* [`"return"`](#rule-return): controls aspects of the return value defintion for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding chained `=>` arrow function returns (`x => y => z => ..`), etc.
 
 * [`"this"`](#rule-this): controls if `=>` arrow functions must have a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function.
 
-   This rule can also optionally forbid `this`-containing `=>` arrow functions from the global scope.
+   This rule can optionally forbid `this`-containing `=>` arrow functions from the global scope.
 
 ## Enabling The Plugin
 
@@ -41,7 +39,7 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
 "rules": {
     "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
     "@getify/proper-arrows/name": "error",
-    "@getify/proper-arrows/return": "error",
+    "@getify/proper-arrows/return": ["error",{"object":true}],
     "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
 }
 ```
@@ -58,7 +56,7 @@ To load the plugin and enable its rules via a project's `package.json`:
     "rules": {
         "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
         "@getify/proper-arrows/name": "error",
-        "@getify/proper-arrows/return": "error",
+        "@getify/proper-arrows/return": ["error",{"object":true}],
         "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
 }
@@ -77,7 +75,7 @@ eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: e
 ```
 
 ```cmd
-eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/return: error' ..
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/return: [error,{"object":true}' ..
 ```
 
 ```cmd
@@ -109,9 +107,9 @@ Then lint some code like this:
 ```js
 eslinter.verify(".. some code ..",{
     rules: {
-        "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
+        "@getify/proper-arrows/params": ["error",{unused:"trailing"}],
         "@getify/proper-arrows/name": "error",
-        "@getify/proper-arrows/return": "error",
+        "@getify/proper-arrows/return": ["error",{object:true}],
         "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
 });
@@ -130,7 +128,7 @@ Once the plugin is loaded, the rule can be configured using inline code comments
 ```
 
 ```js
-/* eslint "@getify/proper-arrows/return": "error" */
+/* eslint "@getify/proper-arrows/return": ["error",{"object":true}] */
 ```
 
 ```js
@@ -153,7 +151,7 @@ To turn this rule on:
 "@getify/proper-arrows/params": [ "error", { "unused": true, "count": 3, "length": 4, "allow": [ "e", "err" ] } ]
 ```
 
-The main purpose of this rule is to prevent readability harm for `=>` arrow functions by ensuring the parameters are clean and "proper".
+The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring the parameters are clean and "proper".
 
 By forbidding unused parameters, the reader is not confused searching for their usage. By requiring parameters that are long enough to be meaningful names, the reader understands the function better. By limiting the number of parameters, the reader is more easily able to visually distinguish the whole function definition.
 
@@ -179,7 +177,7 @@ The **proper-arrows**/*params* rule can be configured with any combination of th
 
 **Note:** The default behavior is that all three modes are turned on. You must specifically configure each mode to (effectively) disable it.
 
-* [`"unused"`](#rule-params-configuration-unused) (default: `"all"`) prevents parameter names that are not used in the function. Can also be set to `"trailing"` to only report errors for trailing parameters -- that is, only those which are unused that come after the last parameter that is used -- or `"none"` to disable this mode.
+* [`"unused"`](#rule-params-configuration-unused) (default: `"all"`) forbids named parameters that are not used inside the function. Can also be set to `"trailing"` to only report unused errors for trailing parameters -- that is, only those which come after the last parameter that is used -- or set to `"none"` to disable this mode.
 
 * [`"count"`](#rule-params-configuration-count) (default: `3`) is the maximum count for parameters on an `=>` arrow function. All parameters are counted to check against the limit, including any `"allowed"` parameters and the "...rest" parameter. Set to a larger number to effectively disable this mode.
 
@@ -398,7 +396,9 @@ In this snippet, all three `=>` arrow functions are anonymous (no name inference
 
 ## Rule: `"return"`
 
-The **proper-arrows**/*return* rule forbids `=>` arrow functions from returning object literals in the concise-expression-body form (i.e., `x => ({x})`).
+The **proper-arrows**/*return* rule controls certain aspects of the concise return values of `=>` arrow functions.
+
+This rule can be configured to forbid returning object literals in the concise expression form (`"object"`), and forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`).
 
 To turn this rule on:
 
@@ -406,27 +406,103 @@ To turn this rule on:
 "@getify/proper-arrows/return": "error"
 ```
 
-The main purpose of this rule is to avoid the potential readability confusion of the concise-expression-body form with object literals, where the `{ }` looks like a function body.
-
-**Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode. However, that built-in rule mode is only defined for `as-needed`, which requires always using the concise-expression-body form for all other `=>` arrow functions where it's possible to do so.
-
-The **proper-arrows**/*return* rule is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
-
-If returning an object literal from an `=>` arrow function, use the full-body return form:
-
-```js
-var x => { return { x, y }; }
+```json
+"@getify/proper-arrows/return": [ "error", { "object": true, "chained": true } ]
 ```
 
-In this snippet, the `=>` arrow function uses the full-body return form for the object literal. As such, it would pass this rule.
+The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring concise return values are clean and "proper".
+
+By forbidding concise return of object literals, the reader is not confused at first glance by the `{ .. }` looking like a non-concise function body. By forbidding chained `=>` arrow function concise returns without visual delimiters (like `( .. )`), the reader doesn't have to visually parse functions in a reverse/right-to-left fashion to determine the function boundaries.
+
+For example:
+
+```js
+var fn = prop => ( val => { return { [prop]: val }; } );
+```
+
+In this snippet, the chained `=>` arrow function is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. Therefore, the **proper-arrows**/*return* rule would not report any errors.
 
 By contrast, this rule *would* report errors for:
 
 ```js
-var x => ({ x, y });
+var fn = prop => val => ({ [prop]: val });
+```
+
+Here, the chained `=>` arrow function return is not as clear, and the concise return of the object literal can be confused as a function block at first glance.
+
+### Rule Configuration
+
+The **proper-arrows**/*return* rule can be configured with two (non-exclusive) modes: `"object"` and `"chained"`.
+
+**Note:** The default behavior is that both modes are turned on for this rule. You must specifically configure each mode to disable it.
+
+* [`"object"`](#rule-return-configuration-object) (default: `true`) forbids returning object literals as concise return expressions.
+
+* [`"chained"`](#rule-return-configuration-chained) (default: `true`) forbids returning an `=>` arrow function (aka, "chained arrow returns") without visual delimiters `( .. )`.
+
+#### Rule `"return"` Configuration: `"object"`
+
+**Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode. However, that built-in rule mode is only defined for `as-needed`, which requires always using the concise-expression-body form for all other `=>` arrow functions where it's possible to do so.
+
+The **proper-arrows**/*return* rule's `"object"` mode is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
+
+To configure this rule mode (defaults to on):
+
+```json
+"@getify/proper-arrows/return": [ "error", { "object": true } ]
+```
+
+If returning an object literal from an `=>` arrow function, use the full-body return form:
+
+```js
+var fn = prop => val => { return { [prop]: val }; };
+```
+
+In this snippet, the `=>` arrow function uses the full-body return form for the object literal. As such, it would pass this rule.
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+var fn = prop => val => ({ [prop]: val });
 ```
 
 In this snippet, the `=>` arrow function uses the concise-expression-body form with the object literal.
+
+#### Rule `"return"` Configuration: `"chained"`
+
+To configure this rule mode (defaults to on):
+
+```json
+"@getify/proper-arrows/return": [ "error", { "chained": true } ]
+```
+
+This rule mode requires `( .. )` surrounding any concise return that is itself an `=>` arrow function, because the parentheses help visually disambiguate where the function boundaries are, especially when there are several `=>` arrow functions chained together.
+
+If concise returning a chained `=>` arrow function, wrap `( .. )` around it:
+
+```js
+var fn = prop => ( val => { return { [prop]: val }; } );
+```
+
+In this snippet, the chained `=>` arrow function return is visually disambiguated with `( .. )`. As such, it would pass this rule.
+
+**Though this rule does require it**, visual ambiguity can even further be reduced by using whitespace to position the delimiters similarly to regular function bodies delimited by `{ .. }`:
+
+```js
+var fn = prop => (
+    val => { return { [prop]: val }; }
+);
+```
+
+**Note:** The extra whitespace is merely a readability suggestion if you plan to use this rule, not a requirement of it.
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+var fn = prop => val => { return { [prop]: val }; };
+```
+
+In this snippet, the boundary of the chained `=>` arrow function return is less clear.
 
 ## Rule: `"this"`
 
@@ -438,7 +514,7 @@ To turn this rule on:
 "@getify/proper-arrows/this": "error"
 ```
 
-The main purpose of this rule is to prevent usage of `=>` arrow functions as just function shorthand (i.e., `arr.map(x => x * 2)`), which can be argued is a misusage. Concise `=>` arrow function syntax (with all its myriad variations) can harm readability, so instead `=>` arrow functions should only be used when the "lexical this" behavior is needed.
+The main purpose of this rule is to avoid usage of `=>` arrow functions as just function shorthand (i.e., `arr.map(x => x * 2)`), which can be argued is a misusage. Concise `=>` arrow function syntax (with all its myriad variations) can harm readability, so instead `=>` arrow functions should only be used when the "lexical this" behavior is needed.
 
 Since `=>` arrow functions don't have their own `this`, they treat any `this` reference as a normal variable (not a special keyword). That means `this` is lexically looked up through any parent scopes until a valid definition of `this` is found -- from a normal non-arrow function, or finally in the global scope itself.
 
@@ -478,7 +554,7 @@ To pass the **proper-arrows**/*this* rule without a reported error, all `=>` arr
 
 ### Rule Configuration
 
-The **proper-arrows**/*this* rule can be configured in three modes: `"nested"` (default), `"always"`, and `"never"`.
+The **proper-arrows**/*this* rule can be configured in one of three modes: `"nested"` (default), `"always"`, and `"never"`.
 
 * [`"nested"`](#rule-this-configuration-nested) (default) permits a `this` to appear lower in a nested `=>` arrow function (i.e., `x = y => z => this.foo(z)`), as long as there is no non-arrow function boundary crossed.
 

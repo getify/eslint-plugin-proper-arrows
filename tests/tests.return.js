@@ -1,33 +1,160 @@
 "use strict";
 
 var linterOptions = {
-	"return": {
+	returnDefault: {
 		parserOptions: { ecmaVersion: 2015, },
 		rules: { "@getify/proper-arrows/return": "error", },
 	},
+	returnObjectDefault: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{chained:false,},], },
+	},
+	returnObject: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,},], },
+	},
+	returnChainedDefault: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,},], },
+	},
+	returnChained: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,},], },
+	},
 };
 
-QUnit.test( "RETURN: arrow with regular return", function test(assert){
+QUnit.test( "RETURN (default): conforming", function test(assert){
 	var code = `
 		var x = y => { return { y }; };
 	`;
 
-	var results = eslinter.verify( code, linterOptions["return"] );
+	var results = eslinter.verify( code, linterOptions.returnDefault );
 
 	assert.expect( 1 );
 	assert.strictEqual( results.length, 0, "no errors" );
 } );
 
-QUnit.test( "RETURN: arrow with concise-object return", function test(assert){
+QUnit.test( "RETURN (default): violating", function test(assert){
+	var code = `
+		var x = y => z => ({ y, z });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnDefault );
+	var [
+		{ ruleId: ruleId1, messageId: messageId1, } = {},
+		{ ruleId: ruleId2, messageId: messageId2, } = {},
+	] = results || [];
+
+	assert.expect( 5 );
+	assert.strictEqual( results.length, 2, "only 2 errors" );
+	assert.strictEqual( ruleId1, "@getify/proper-arrows/return", "ruleId1" );
+	assert.strictEqual( messageId1, "noChainedArrow", "messageId1" );
+	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
+	assert.strictEqual( messageId2, "noConciseObject", "messageId2" );
+} );
+
+QUnit.test( "RETURN (object, default): conforming", function test(assert){
+	var code = `
+		var x = y => { return { y }; };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnObjectDefault );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (object, default): violating", function test(assert){
 	var code = `
 		var x = y => ({ y });
 	`;
 
-	var results = eslinter.verify( code, linterOptions["return"] );
+	var results = eslinter.verify( code, linterOptions.returnObjectDefault );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
 	assert.strictEqual( messageId, "noConciseObject", "messageId" );
+} );
+
+QUnit.test( "RETURN (object): conforming", function test(assert){
+	var code = `
+		var x = y => { return { y }; };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnObject );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (object): violating", function test(assert){
+	var code = `
+		var x = y => ({ y });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnObject );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noConciseObject", "messageId" );
+} );
+
+QUnit.test( "RETURN (chained, default): conforming", function test(assert){
+	var code = `
+		var f;
+		f = x => (y => x + y);
+		f = x => { return y => x + y; };
+		f = x => (y => ({x,y}));
+		f = x => ((y) => ({x,y}));
+		f = x => (y => (z => x + y + z));
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnChained );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (chained, default): violating", function test(assert){
+	var code = `
+		var f;
+		f = x => y => x + y;
+		f = x => y => ({x,y});
+		f = x => (y) => ({x,y});
+		f = x => (y) => (y);
+		f = x => y => (z => x + y + z);
+		f = x => y => z => x + y + z;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnChained );
+	var [
+		{ ruleId: ruleId1, messageId: messageId1, } = {},
+		{ ruleId: ruleId2, messageId: messageId2, } = {},
+		{ ruleId: ruleId3, messageId: messageId3, } = {},
+		{ ruleId: ruleId4, messageId: messageId4, } = {},
+		{ ruleId: ruleId5, messageId: messageId5, } = {},
+		{ ruleId: ruleId6, messageId: messageId6, } = {},
+		{ ruleId: ruleId7, messageId: messageId7, } = {},
+	] = results || [];
+
+	assert.expect( 15 );
+	assert.strictEqual( results.length, 7, "only 7 errors" );
+	assert.strictEqual( ruleId1, "@getify/proper-arrows/return", "ruleId1" );
+	assert.strictEqual( messageId1, "noChainedArrow", "messageId1" );
+	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
+	assert.strictEqual( messageId2, "noChainedArrow", "messageId2" );
+	assert.strictEqual( ruleId3, "@getify/proper-arrows/return", "ruleId3" );
+	assert.strictEqual( messageId3, "noChainedArrow", "messageId3" );
+	assert.strictEqual( ruleId4, "@getify/proper-arrows/return", "ruleId4" );
+	assert.strictEqual( messageId4, "noChainedArrow", "messageId4" );
+	assert.strictEqual( ruleId5, "@getify/proper-arrows/return", "ruleId5" );
+	assert.strictEqual( messageId5, "noChainedArrow", "messageId5" );
+	assert.strictEqual( ruleId6, "@getify/proper-arrows/return", "ruleId6" );
+	assert.strictEqual( messageId6, "noChainedArrow", "messageId6" );
+	assert.strictEqual( ruleId7, "@getify/proper-arrows/return", "ruleId7" );
+	assert.strictEqual( messageId7, "noChainedArrow", "messageId7" );
 } );

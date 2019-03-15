@@ -56,7 +56,7 @@ QUnit.test( "PARAMS (default): conforming", function test(assert){
 	assert.strictEqual( results.length, 0, "no errors" );
 } );
 
-QUnit.test( "PARAMS (default): violating all rules", function test(assert){
+QUnit.test( "PARAMS (default): violating", function test(assert){
 	var code = `
 		var f = (x,[y],z,{w}) => y + z;
 	`;
@@ -128,7 +128,7 @@ QUnit.test( "PARAMS (unused: all, default): violating", function test(assert){
 	assert.strictEqual( messageId4, "unused", "messageId4" );
 } );
 
-QUnit.test( "PARAMS (unused: all): conforming / nesting, shadowing", function test(assert){
+QUnit.test( "PARAMS (unused: all): conforming | nesting, shadowing", function test(assert){
 	var code = `
 		var f;
 		f = (x) => x;
@@ -148,7 +148,7 @@ QUnit.test( "PARAMS (unused: all): conforming / nesting, shadowing", function te
 	assert.strictEqual( results.length, 0, "no errors" );
 } );
 
-QUnit.test( "PARAMS (unused: all): violating / nesting, shadowing", function test(assert){
+QUnit.test( "PARAMS (unused: all): violating | nesting, shadowing", function test(assert){
 	var code = `
 		var f;
 
