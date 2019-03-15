@@ -18,7 +18,7 @@ The rules defined in this plugin:
 
    **Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
 
-* [`"object-return"`](#rule-object-return): forbids `=>` arrow functions from returning objects in the concise-expression-body form, such as `x => ({ x })`.
+* [`"return"`](#rule-return): forbids `=>` arrow functions from returning objects in the concise-expression-body form, such as `x => ({ x })`.
 
    **Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode, but differs a bit.
 
@@ -40,7 +40,7 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
 ],
 "rules": {
     "@getify/proper-arrows/name": "error",
-    "@getify/proper-arrows/object-return": "error",
+    "@getify/proper-arrows/return": "error",
     "@getify/proper-arrows/this": ["error","always"]
 }
 ```
@@ -56,7 +56,7 @@ To load the plugin and enable its rules via a project's `package.json`:
     ],
     "rules": {
         "@getify/proper-arrows/name": "error",
-        "@getify/proper-arrows/object-return": "error",
+        "@getify/proper-arrows/return": "error",
         "@getify/proper-arrows/this": ["error","always"]
     }
 }
@@ -71,7 +71,7 @@ eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: e
 ```
 
 ```cmd
-eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/object-return: error' ..
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/return: error' ..
 ```
 
 ```cmd
@@ -89,9 +89,11 @@ var properArrows = require("@getify/eslint-plugin-proper-arrows");
 
 var eslinter = new (require("eslint").Linter)();
 
+eslinter.defineRule("@getify/proper-arrows/params",properArrows.rules.params);
+
 eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules.name);
 
-eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules["object-return"]);
+eslinter.defineRule("@getify/proper-arrows/return",properArrows.rules.return);
 
 eslinter.defineRule("@getify/proper-arrows/this",properArrows.rules.this);
 ```
@@ -101,8 +103,9 @@ Then lint some code like this:
 ```js
 eslinter.verify(".. some code ..",{
     rules: {
+        "@getify/proper-arrows/params": "error",
         "@getify/proper-arrows/name": "error",
-        "@getify/proper-arrows/object-return": "error",
+        "@getify/proper-arrows/return": "error",
         "@getify/proper-arrows/this": ["error","always"]
     }
 });
@@ -121,7 +124,7 @@ Once the plugin is loaded, the rule can be configured using inline code comments
 ```
 
 ```js
-/* eslint "@getify/proper-arrows/object-return": "error" */
+/* eslint "@getify/proper-arrows/return": "error" */
 ```
 
 ```js
@@ -387,21 +390,21 @@ getName( v => v * 4 );     // ""
 
 In this snippet, all three `=>` arrow functions are anonymous (no name inference possible).
 
-## Rule: `"object-return"`
+## Rule: `"return"`
 
-The **proper-arrows**/*object-return* rule forbids `=>` arrow functions from returning object literals in the concise-expression-body form (i.e., `x => ({x})`).
+The **proper-arrows**/*return* rule forbids `=>` arrow functions from returning object literals in the concise-expression-body form (i.e., `x => ({x})`).
 
 To turn this rule on:
 
 ```json
-"@getify/proper-arrows/object-return": "error"
+"@getify/proper-arrows/return": "error"
 ```
 
 The main purpose of this rule is to avoid the potential readability confusion of the concise-expression-body form with object literals, where the `{ }` looks like a function body.
 
 **Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode. However, that built-in rule mode is only defined for `as-needed`, which requires always using the concise-expression-body form for all other `=>` arrow functions where it's possible to do so.
 
-The **proper-arrows**/*object-return* rule is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
+The **proper-arrows**/*return* rule is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
 
 If returning an object literal from an `=>` arrow function, use the full-body return form:
 
