@@ -7,25 +7,35 @@ var linterOptions = {
 	},
 	returnObjectDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{chained:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{chained:false,sequence:false,trivial:true,},], },
 	},
 	returnObject: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,sequence:false,trivial:true,},], },
 	},
 	returnChainedDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,sequence:false,trivial:true,},], },
 	},
 	returnChained: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,sequence:false,trivial:true,},], },
+	},
+	returnSequenceDefault: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:false,trivial:true,},], },
+	},
+	returnSequence: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:false,sequence:true,trivial:true,},], },
 	},
 };
 
 QUnit.test( "RETURN (default): conforming", function test(assert){
 	var code = `
 		var x = y => { return { y }; };
+		var f = a => { return (1,a,2); };
+		var g = r => (k => r + k);
 	`;
 
 	var results = eslinter.verify( code, linterOptions.returnDefault );
@@ -37,20 +47,24 @@ QUnit.test( "RETURN (default): conforming", function test(assert){
 QUnit.test( "RETURN (default): violating", function test(assert){
 	var code = `
 		var x = y => z => ({ y, z });
+		var f = a => (1,a,2);
 	`;
 
 	var results = eslinter.verify( code, linterOptions.returnDefault );
 	var [
 		{ ruleId: ruleId1, messageId: messageId1, } = {},
 		{ ruleId: ruleId2, messageId: messageId2, } = {},
+		{ ruleId: ruleId3, messageId: messageId3, } = {},
 	] = results || [];
 
-	assert.expect( 5 );
-	assert.strictEqual( results.length, 2, "only 2 errors" );
+	assert.expect( 7 );
+	assert.strictEqual( results.length, 3, "only 3 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/return", "ruleId1" );
 	assert.strictEqual( messageId1, "noChainedArrow", "messageId1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
 	assert.strictEqual( messageId2, "noConciseObject", "messageId2" );
+	assert.strictEqual( ruleId3, "@getify/proper-arrows/return", "ruleId3" );
+	assert.strictEqual( messageId3, "noSequence", "messageId3" );
 } );
 
 QUnit.test( "RETURN (object, default): conforming", function test(assert){
@@ -157,4 +171,54 @@ QUnit.test( "RETURN (chained, default): violating", function test(assert){
 	assert.strictEqual( messageId6, "noChainedArrow", "messageId6" );
 	assert.strictEqual( ruleId7, "@getify/proper-arrows/return", "ruleId7" );
 	assert.strictEqual( messageId7, "noChainedArrow", "messageId7" );
+} );
+
+QUnit.test( "RETURN (sequence, default): conforming", function test(assert){
+	var code = `
+		var x = y => { return (1,y,2); };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnSequenceDefault );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (sequence, default): violating", function test(assert){
+	var code = `
+		var x = y => (1,y,2);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnSequenceDefault );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noSequence", "messageId" );
+} );
+
+QUnit.test( "RETURN (sequence): conforming", function test(assert){
+	var code = `
+		var x = y => { return (1,y,2); };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnSequence );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (sequence): violating", function test(assert){
+	var code = `
+		var x = y => (1,y,2);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnSequence );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noSequence", "messageId" );
 } );

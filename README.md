@@ -432,7 +432,7 @@ In this snippet, all three `=>` arrow functions are anonymous (no name inference
 
 The **proper-arrows**/*return* rule controls certain aspects of the concise return values of `=>` arrow functions.
 
-This rule can be configured to forbid returning object literals in the concise expression form (`"object"`), and forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`).
+This rule can be configured to forbid returning object literals in the concise expression form (`"object"`), forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`), and forbid concise returns of comma sequences (`"sequence"`).
 
 To turn this rule on:
 
@@ -441,46 +441,50 @@ To turn this rule on:
 ```
 
 ```json
-"@getify/proper-arrows/return": [ "error", { "object": true, "chained": true, "trivial": false } ]
+"@getify/proper-arrows/return": [ "error", { "object": true, "chained": true, "sequence": true, "trivial": false } ]
 ```
 
 The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring concise return values are clean and "proper".
 
-By forbidding concise return of object literals, the reader is not confused at first glance by the `{ .. }` looking like a non-concise function body. By forbidding chained `=>` arrow function concise returns without visual delimiters (like `( .. )`), the reader doesn't have to visually parse functions in a reverse/right-to-left fashion to determine the function boundaries.
+By forbidding concise return of object literals, the reader is not confused at first glance by the `{ .. }` looking like a non-concise function body. By forbidding chained `=>` arrow function concise returns without visual delimiters (like `( .. )`), the reader doesn't have to visually parse functions in a reverse/right-to-left fashion to determine the function boundaries. By forbidding concise return of comma sequences (ie, `(x = 3,y = foo(x + 1),[x,y])`), the reader doesn't have trouble figuring out which value will be returned from the function.
 
 For example:
 
 ```js
-var fn = prop => ( val => { return { [prop]: val }; } );
+var fn1 = prop => ( val => { return { [prop]: val }; } );
+var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y] };
 ```
 
-In this snippet, the chained `=>` arrow function is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. Therefore, the **proper-arrows**/*return* rule would not report any errors.
+In this snippet, the chained `=>` arrow function `fn1` is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. For `fn2`, the function body's return value (`[x,y]`) is clear. Therefore, the **proper-arrows**/*return* rule would not report any errors.
 
-By contrast, this rule *would* report errors for:
+By contrast, this rule *would* report errors for each of these statements:
 
 ```js
 var fn = prop => val => ({ [prop]: val });
+var fn2 = (x,y) => (x = 3, y = foo(x + 1), [x,y] );
 ```
 
-Here, the chained `=>` arrow function return is not as clear, and the concise return of the object literal can be confused as a function block at first glance.
+Here, the chained `=>` arrow function return is not as clear, the concise return of the object literal can be confused as a function block at first glance, and the concise return of the comma sequence makes it hard to determine which value will actually be returned.
 
 ### Rule Configuration
 
-The **proper-arrows**/*return* rule can be configured with two (non-exclusive) modes: `"object"` and `"chained"`.
+The **proper-arrows**/*return* rule can be configured with three (non-exclusive) modes: `"object"`, `"chained"`, and `"sequence"`.
 
-**Note:** The default behavior is that both modes are turned on for this rule. You must specifically configure each mode to disable it.
+**Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
 
 * [`"object"`](#rule-return-configuration-object) (default: `true`) forbids returning object literals as concise return expressions.
 
-* [`"chained"`](#rule-return-configuration-chained) (default: `true`) forbids returning an `=>` arrow function (aka, "chained arrow returns") without visual delimiters `( .. )`.
+* [`"chained"`](#rule-return-configuration-chained) (default: `true`) forbids returning `=>` arrow functions (aka, "chained arrow returns") as concise return expressions, without visual delimiters `( .. )`.
+
+* [`"sequence"`](#rule-return-configuration-sequence) (default: `true`) forbids returning comma sequences (ie, `(x = 3, y + x)`) as concise return expressions.
 
 #### Rule `"return"` Configuration: `"object"`
 
-**Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode. However, that built-in rule mode is only defined for `as-needed`, which requires always using the concise-expression-body form for all other `=>` arrow functions where it's possible to do so.
+**Note:** This rule is similar to the [built-in ESLint "arrow-body-style" rule](https://eslint.org/docs/rules/arrow-body-style), specifically the `requireReturnForObjectLiteral: true` mode. However, that built-in rule mode is only defined for `as-needed`, which requires always using the concise return expression form for all other `=>` arrow functions where it's possible to do so.
 
-The **proper-arrows**/*return* rule's `"object"` mode is different (more narrowly focused): it only disallows the concise-expression-body when returning an object; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
+The **proper-arrows**/*return* rule's `"object"` mode is different (more narrowly focused): it only disallows the concise return of an object literal; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
 
-To configure this rule mode (defaults to on):
+To configure this rule mode (defaults to on, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/return": [ "error", { "object": true, "trivial": false } ]
@@ -500,11 +504,11 @@ By contrast, this rule mode *would* report errors for:
 var fn = prop => val => ({ [prop]: val });
 ```
 
-In this snippet, the `=>` arrow function uses the concise-expression-body form with the object literal.
+In this snippet, the `=>` arrow function has an object literal as the concise return expression.
 
 #### Rule `"return"` Configuration: `"chained"`
 
-To configure this rule mode (defaults to on):
+To configure this rule mode (defaults to on, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/return": [ "error", { "chained": true, "trivial": false } ]
@@ -537,6 +541,36 @@ var fn = prop => val => { return { [prop]: val }; };
 ```
 
 In this snippet, the boundary of the chained `=>` arrow function return is less clear.
+
+#### Rule `"return"` Configuration: `"sequence"`
+
+**Note:** This rule is similar to the [built-in ESLint "no-sequences" rule](https://eslint.org/docs/rules/no-sequences).
+
+The **proper-arrows**/*return* rule's `"sequence"` mode is different (more narrowly focused): it only disallows comma sequences as `=>` arrow function concise return expressions.
+
+To configure this rule mode (defaults to on, set as `false` to turn off):
+
+```json
+"@getify/proper-arrows/return": [ "error", { "sequence": true, "trivial": false } ]
+```
+
+Comma sequences are not very common, but one place they're a bit more common is as the concise return expression from an `=>` arrow function so that multiple expression-statments can be strung together without needing a full function body. This may be clever or concise, but it's almost always less readable than just using separate statements.
+
+For example:
+
+```js
+var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y] };
+```
+
+In this snippet, the `=>` arrow function uses the full-body return form with separate statements and an explicit `return` statement. As such, it would pass this rule.
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+var fn2 = (x,y) => (x = 3, y = foo(x + 1), [x,y] );
+```
+
+In this snippet, the `=>` arrow function has a comma sequence as the concise return expression.
 
 ## Rule: `"this"`
 
