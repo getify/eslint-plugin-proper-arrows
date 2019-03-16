@@ -6,6 +6,7 @@ var linterOptions = {
 		rules: {
 			"@getify/proper-arrows/params": "error",
 			"@getify/proper-arrows/name": "error",
+			"@getify/proper-arrows/location": "error",
 			"@getify/proper-arrows/return": "error",
 			"@getify/proper-arrows/this": "error",
 		},
@@ -15,22 +16,39 @@ var linterOptions = {
 		rules: {
 			"@getify/proper-arrows/params": ["error",{trivial:true,},],
 			"@getify/proper-arrows/name": ["error",{trivial:true,},],
+			"@getify/proper-arrows/location": ["error",{trivial:true,},],
 			"@getify/proper-arrows/return": ["error",{trivial:true,},],
 			"@getify/proper-arrows/this": ["error","nested",{trivial:true,},],
+		},
+	},
+	trivialModuleDefault: {
+		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
+		rules: {
+			"@getify/proper-arrows/location": "error",
+		},
+	},
+	trivialModule: {
+		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
+		rules: {
+			"@getify/proper-arrows/location": ["error",{trivial:true,},],
 		},
 	},
 };
 
 QUnit.test( "TRIVIAL (default): violating", function test(assert){
 	var code = `
-		var f;
-		f = () => () => {};
-		f(() => 1);
-		f(() => e);
-		f(j => {});
-		f(z => z);
-		f(g => h);
-		f(k => null);
+		function foo() {
+			var f;
+			f = () => () => {};
+			f(() => 1);
+			f(() => e);
+			f(j => {});
+			f(z => z);
+			f(g => h);
+			f(k => null);
+			return { f: v => v };
+		}
+		var f = v => v;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivialDefault );
@@ -44,14 +62,18 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 
 QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	var code = `
-		var f;
-		f = () => () => {};
-		f(() => 1);
-		f(() => e);
-		f(j => {});
-		f(z => z);
-		f(g => h);
-		f(k => null);
+		function foo() {
+			var f;
+			f = () => () => {};
+			f(() => 1);
+			f(() => e);
+			f(j => {});
+			f(z => z);
+			f(g => h);
+			f(k => null);
+			return { f: v => v };
+		}
+		var f = v => v;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivial );
@@ -79,22 +101,28 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 		{ ruleId: ruleId21, messageId: messageId21, message: message21, } = {},
 		{ ruleId: ruleId22, messageId: messageId22, message: message22, } = {},
 		{ ruleId: ruleId23, messageId: messageId23, message: message23, } = {},
+		{ ruleId: ruleId24, messageId: messageId24, message: message24, } = {},
+		{ ruleId: ruleId25, messageId: messageId25, message: message25, } = {},
+		{ ruleId: ruleId26, messageId: messageId26, message: message26, } = {},
+		{ ruleId: ruleId27, messageId: messageId27, message: message27, } = {},
+		{ ruleId: ruleId28, messageId: messageId28, message: message28, } = {},
+		{ ruleId: ruleId29, messageId: messageId29, message: message29, } = {},
 	] = results || [];
 
 	assert.expect( 54 );
-	assert.strictEqual( results.length, 23, "only 23 errors" );
+	assert.strictEqual( results.length, 29, "only 29 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/this", "ruleId1" );
 	assert.strictEqual( messageId1, "noThisNested", "messageId1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
 	assert.strictEqual( messageId2, "noChainedArrow", "messageId2" );
-	assert.strictEqual( ruleId3, "@getify/proper-arrows/this", "ruleId3" );
-	assert.strictEqual( messageId3, "noThisNested", "messageId3" );
-	assert.strictEqual( ruleId4, "@getify/proper-arrows/name", "ruleId4" );
-	assert.strictEqual( messageId4, "noName", "messageId4" );
-	assert.strictEqual( ruleId5, "@getify/proper-arrows/name", "ruleId5" );
-	assert.strictEqual( messageId5, "noName", "messageId5" );
-	assert.strictEqual( ruleId6, "@getify/proper-arrows/this", "ruleId6" );
-	assert.strictEqual( messageId6, "noThisNested", "messageId6" );
+	assert.strictEqual( ruleId3, "@getify/proper-arrows/name", "ruleId3" );
+	assert.strictEqual( messageId3, "noName", "messageId3" );
+	assert.strictEqual( ruleId4, "@getify/proper-arrows/this", "ruleId4" );
+	assert.strictEqual( messageId4, "noThisNested", "messageId4" );
+	assert.strictEqual( ruleId5, "@getify/proper-arrows/this", "ruleId5" );
+	assert.strictEqual( messageId5, "noThisNested", "messageId5" );
+	assert.strictEqual( ruleId6, "@getify/proper-arrows/name", "ruleId6" );
+	assert.strictEqual( messageId6, "noName", "messageId6" );
 	assert.strictEqual( ruleId7, "@getify/proper-arrows/name", "ruleId7" );
 	assert.strictEqual( messageId7, "noName", "messageId7" );
 	assert.strictEqual( ruleId8, "@getify/proper-arrows/this", "ruleId8" );
@@ -111,21 +139,21 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	assert.strictEqual( messageId12, "noThisNested", "messageId12" );
 	assert.strictEqual( ruleId13, "@getify/proper-arrows/name", "ruleId13" );
 	assert.strictEqual( messageId13, "noName", "messageId13" );
-	assert.strictEqual( ruleId14, "@getify/proper-arrows/this", "ruleId14" );
-	assert.strictEqual( messageId14, "noThisNested", "messageId14" );
-	assert.strictEqual( ruleId15, "@getify/proper-arrows/params", "ruleId15" );
-	assert.strictEqual( messageId15, "tooShort", "messageId15" );
-	assert.ok( /`z`/.test(message15), "message15" );
+	assert.strictEqual( ruleId14, "@getify/proper-arrows/params", "ruleId14" );
+	assert.strictEqual( messageId14, "tooShort", "messageId14" );
+	assert.ok( /`z`/.test(message14), "message14" );
+	assert.strictEqual( ruleId15, "@getify/proper-arrows/this", "ruleId15" );
+	assert.strictEqual( messageId15, "noThisNested", "messageId15" );
 	assert.strictEqual( ruleId16, "@getify/proper-arrows/name", "ruleId16" );
 	assert.strictEqual( messageId16, "noName", "messageId16" );
 	assert.strictEqual( ruleId17, "@getify/proper-arrows/params", "ruleId17" );
-	assert.strictEqual( messageId17, "tooShort", "messageId17" );
+	assert.strictEqual( messageId17, "unused", "messageId17" );
 	assert.ok( /`g`/.test(message17), "message17" );
-	assert.strictEqual( ruleId18, "@getify/proper-arrows/params", "ruleId18" );
-	assert.strictEqual( messageId18, "unused", "messageId18" );
-	assert.ok( /`g`/.test(message18), "message18" );
-	assert.strictEqual( ruleId19, "@getify/proper-arrows/this", "ruleId19" );
-	assert.strictEqual( messageId19, "noThisNested", "messageId19" );
+	assert.strictEqual( ruleId18, "@getify/proper-arrows/this", "ruleId18" );
+	assert.strictEqual( messageId18, "noThisNested", "messageId18" );
+	assert.strictEqual( ruleId19, "@getify/proper-arrows/params", "ruleId19" );
+	assert.strictEqual( messageId19, "tooShort", "messageId19" );
+	assert.ok( /`g`/.test(message19), "message19" );
 	assert.strictEqual( ruleId20, "@getify/proper-arrows/name", "ruleId20" );
 	assert.strictEqual( messageId20, "noName", "messageId20" );
 	assert.strictEqual( ruleId21, "@getify/proper-arrows/params", "ruleId21" );
@@ -136,4 +164,31 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	assert.ok( /`k`/.test(message22), "message22" );
 	assert.strictEqual( ruleId23, "@getify/proper-arrows/this", "ruleId23" );
 	assert.strictEqual( messageId23, "noThisNested", "messageId23" );
+} );
+
+QUnit.test( "TRIVIAL (module-export, default): violating", function test(assert){
+	var code = `
+		export default () => {};
+	`;
+
+	var results = eslinter.verify( code, linterOptions.trivialModuleDefault );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(assert){
+	var code = `
+		export default () => {};
+	`;
+
+	var results = eslinter.verify( code, linterOptions.trivialModule );
+
+	assert.expect( 1 );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/location", "ruleId" );
+	assert.strictEqual( messageId, "noExport", "messageId" );
 } );

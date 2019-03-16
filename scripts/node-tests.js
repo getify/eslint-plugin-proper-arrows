@@ -22,6 +22,7 @@ else {
 
 eslinter.defineRule("@getify/proper-arrows/params",properArrows.rules.params);
 eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules.name);
+eslinter.defineRule("@getify/proper-arrows/location",properArrows.rules.location);
 eslinter.defineRule("@getify/proper-arrows/return",properArrows.rules.return);
 eslinter.defineRule("@getify/proper-arrows/this",properArrows.rules.this);
 
@@ -30,6 +31,7 @@ global.QUnit = require("qunit");
 require(path.join("..","tests","qunit.config.js"));
 require(path.join("..","tests","tests.params.js"));
 require(path.join("..","tests","tests.name.js"));
+require(path.join("..","tests","tests.location.js"));
 require(path.join("..","tests","tests.return.js"));
 require(path.join("..","tests","tests.this.js"));
 require(path.join("..","tests","tests.trivial.js"));

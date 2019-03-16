@@ -8,7 +8,7 @@
 
 ## Overview
 
-The **proper-arrows** ESLint Plugin defines rules that control the definitions of `=>` arrow functions, restricting them to a narrower and more proper usage.
+The **proper-arrows** ESLint plugin provides rules that control the definitions of `=>` arrow functions, restricting them to a narrower and more proper/readable form.
 
 The rules defined in this plugin:
 
@@ -18,9 +18,11 @@ The rules defined in this plugin:
 
    **Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
 
-* [`"return"`](#rule-return): controls aspects of the return value defintion for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding chained `=>` arrow function returns (`x => y => z => ..`), etc.
+* [`"location"`](#rule-location): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
 
-* [`"this"`](#rule-this): controls if `=>` arrow functions must have a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function.
+* [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding chained `=>` arrow function concise returns (`x => y => z => ..`), etc.
+
+* [`"this"`](#rule-this): requires/disallows `=>` arrow functions using a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function.
 
    This rule can optionally forbid `this`-containing `=>` arrow functions from the global scope.
 
@@ -46,13 +48,13 @@ v => v;
 
 These types of functions are so simple that they don't suffer much from readability issues despite their concise syntax. As such, it's likely preferred to allow them even if one of the rules here would normally report them.
 
-By default, all rules will ignore these trivial functions. To instead flag a rule **to not ignore them**, add this configuration option:
+By default, **all rules ignore** these trivial functions. To **force a rule to check trivial functions**, include this configuration option for the rule:
 
 ```json
 { "trivial": true }
 ```
 
-**Note:** The `"trivial"` flag **will not necessarily report** on trivial functions, but it will make trivial functions subject to the checks of the rule/mode in question.
+**Note:** The `"trivial"` option **will not necessarily report** trivial functions, but it will force trivial functions to be checked by the rule/mode in question.
 
 ## Enabling The Plugin
 
@@ -68,7 +70,8 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
 ],
 "rules": {
     "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
-    "@getify/proper-arrows/name": "error",
+    "@getify/proper-arrows/name": ["error",{"trivial":false}],
+    "@getify/proper-arrows/location": ["error",{"global":true}],
     "@getify/proper-arrows/return": ["error",{"object":true}],
     "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
 }
@@ -85,7 +88,8 @@ To load the plugin and enable its rules via a project's `package.json`:
     ],
     "rules": {
         "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
-        "@getify/proper-arrows/name": "error",
+        "@getify/proper-arrows/name": ["error",{"trivial":false}],
+        "@getify/proper-arrows/name": ["error",{"global":true}],
         "@getify/proper-arrows/return": ["error",{"object":true}],
         "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
@@ -101,7 +105,11 @@ eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/params:
 ```
 
 ```cmd
-eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: error' ..
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: [error,{"trivial":false}]' ..
+```
+
+```cmd
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/location: [error,{"global":true}]' ..
 ```
 
 ```cmd
@@ -127,6 +135,8 @@ eslinter.defineRule("@getify/proper-arrows/params",properArrows.rules.params);
 
 eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules.name);
 
+eslinter.defineRule("@getify/proper-arrows/location",properArrows.rules.location);
+
 eslinter.defineRule("@getify/proper-arrows/return",properArrows.rules.return);
 
 eslinter.defineRule("@getify/proper-arrows/this",properArrows.rules.this);
@@ -138,7 +148,8 @@ Then lint some code like this:
 eslinter.verify(".. some code ..",{
     rules: {
         "@getify/proper-arrows/params": ["error",{unused:"trailing"}],
-        "@getify/proper-arrows/name": "error",
+        "@getify/proper-arrows/name": ["error",{trivial:false}],
+        "@getify/proper-arrows/location": ["error",{trivial:true}],
         "@getify/proper-arrows/return": ["error",{object:true}],
         "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
@@ -428,11 +439,161 @@ getName( v => v * 4 );     // ""
 
 In this snippet, all three `=>` arrow functions are anonymous (no name inference possible).
 
+## Rule: `"location"`
+
+The **proper-arrows**/*location* rule restricts where in program structure `=>` arrow functions can be used.
+
+This rule can be configured to forbid `=>` arrow functions in the top-level/global scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and `=>` arrow functions in `export` statements (`"export"`).
+
+To turn this rule on:
+
+```json
+"@getify/proper-arrows/location": "error"
+```
+
+```json
+"@getify/proper-arrows/location": [ "error", { "global": true, "property": true, "export": true, "trivial": false } ]
+```
+
+The main purpose of this rule is to avoid readability harm when using `=>` arrow functions in certain program structure locations.
+
+Placing `=>` arrow functions in the top-level/global scope has no benefit other than preferred style, and are more proper as regular function declarations. Placing `=>` arrow functions on object properties has no benefit other than preferred style, and are more proper as concise object methods. Placing arrow functions in `export` statements offers no benefit other than being more concise, and are more proper as exported named function declarations.
+
+For example:
+
+```js
+var PEOPLE_URL = "http://some.tld/api";
+
+var People = {
+    getData(id,cb) {
+        ajax(PEOPLE_URL,{ id },cb);
+    }
+};
+
+function onData(data) {
+    console.log(data);
+}
+
+export default function lookup(id) {
+    People.getData(id,onData);
+}
+```
+
+In this snippet, the `getData(..)` function is a clear and proper concise method on `People` object, `onData(..)` is a regular function declaration, and `lookup(..)` is a named export declaration. Therefore, the **proper-arrows**/*location* rule would not report any errors.
+
+By contrast, this rule *would* default to reporting errors for each of these `=>` arrow functions:
+
+```js
+var PEOPLE_URL = "http://some.tld/api";
+
+var People = {
+    getData: (id,cb) => ajax(PEOPLE_URL,{ id },cb)
+};
+
+var onData = data => {
+    console.log(data);
+};
+
+export default id => People.getData(id,onData)
+```
+
+None of these usages of `=>` arrow functions are helping the readability or behavior of this snippet.
+
+### Rule Configuration
+
+The **proper-arrows**/*location* rule can be configured with three (non-exclusive) modes: `"global"`, `"property"`, and `"export"`.
+
+**Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
+
+* [`"global"`](#rule-location-configuration-global) (default: `true`) forbids `=>` arrow functions in the top-level/global scope.
+
+* [`"property"`](#rule-location-configuration-property) (default: `true`) forbids assigning `=>` arrow functions to object properties.
+
+* [`"export"`](#rule-location-configuration-export) (default: `true`) forbids `=>` arrow functions in `export` statements.
+
+#### Rule `"location"` Configuration: `"global"`
+
+To configure this rule mode (defaults to on, set as `false` to turn off):
+
+```json
+"@getify/proper-arrows/location": [ "error", { "global": true, "trivial": false } ]
+```
+
+When defining functions at the top-level/global scope, use a regular function declaration:
+
+```js
+function onData(data) {
+    console.log(data);
+}
+```
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+var onData = data => {
+    console.log(data);
+};
+```
+
+In this snippet, the `=>` arrow function is less obviously a function than the function declaration form.
+
+#### Rule `"location"` Configuration: `"property"`
+
+To configure this rule mode (defaults to on, set as `false` to turn off):
+
+```json
+"@getify/proper-arrows/location": [ "error", { "property": true, "trivial": false } ]
+```
+
+When defining a method on an object literal, use the concise method form:
+
+```js
+var People = {
+    getData(id,cb) {
+        ajax(PEOPLE_URL,{ id },cb);
+    }
+};
+```
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+var People = {
+    getData: (id,cb) => ajax(PEOPLE_URL,{ id },cb)
+};
+```
+
+In this snippet, the  `=>` arrow function is less obviously a method than the concise method form.
+
+#### Rule `"location"` Configuration: `"export"`
+
+To configure this rule mode (defaults to on, set as `false` to turn off):
+
+```json
+"@getify/proper-arrows/location": [ "error", { "export": true, "trivial": false } ]
+```
+
+When exporting a function expression, use a named function expression:
+
+```js
+export default function lookup(id) {
+    People.getData(id,onData);
+}
+```
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+export default id => People.getData(id,onData)
+```
+
+In this snippet, the `=>` arrow function is less obviously a function expression than named function expression form.
+
 ## Rule: `"return"`
 
-The **proper-arrows**/*return* rule controls certain aspects of the concise return values of `=>` arrow functions.
+The **proper-arrows**/*return* rule restricts the concise return value kind for `=>` arrow functions.
 
-This rule can be configured to forbid returning object literals in the concise expression form (`"object"`), forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`), and forbid concise returns of comma sequences (`"sequence"`).
+This rule can be configured to forbid concise returns of object literals (`"object"`), forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`), and forbid concise returns of comma sequences (`"sequence"`).
 
 To turn this rule on:
 
