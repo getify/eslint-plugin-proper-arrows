@@ -24,6 +24,36 @@ The rules defined in this plugin:
 
    This rule can optionally forbid `this`-containing `=>` arrow functions from the global scope.
 
+### Trivial `=>` Arrow Functions
+
+It's common for `=>` arrow functions to be used as a shorthand for simple/trivial function roles, such as:
+
+```js
+// no-op function
+() => {};
+
+// constant function
+() => 42;
+
+// closure function
+() => v;
+
+// identity function
+v => v;
+```
+
+**Note:** To be specific on the definition of "trivial" being used here: trivial functions have no more than 1 parameter (simple identifier only), and either have no return (`{}`) or a concise return of a single variable or primitive (non-object) literal.
+
+These types of functions are so simple that they don't suffer much from readability issues despite their concise syntax. As such, it's likely preferred to allow them even if one of the rules here would normally report them.
+
+By default, all rules will ignore these trivial functions. To instead flag a rule **to not ignore them**, add this configuration option:
+
+```json
+{ "trivial": true }
+```
+
+**Note:** The `"trivial"` flag **will not necessarily report** on trivial functions, but it will make trivial functions subject to the checks of the rule/mode in question.
+
 ## Enabling The Plugin
 
 To use **proper-arrows**, load it as a plugin into ESLint and configure the rules as desired.
@@ -148,7 +178,7 @@ To turn this rule on:
 ```
 
 ```json
-"@getify/proper-arrows/params": [ "error", { "unused": true, "count": 3, "length": 4, "allow": [ "e", "err" ] } ]
+"@getify/proper-arrows/params": [ "error", { "unused": true, "count": 3, "length": 4, "allow": [ "e", "err" ], "trivial": false } ]
 ```
 
 The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring the parameters are clean and "proper".
@@ -196,7 +226,7 @@ To configure this rule mode (default: `"all"`):
 ```
 
 ```json
-"@getify/proper-arrows/params": [ "error", { "unused": "all" } ]
+"@getify/proper-arrows/params": [ "error", { "unused": "all", "trivial": false } ]
 ```
 
 The `"unused": "all"` (default) mode checks each parameter to see if it's used anywhere within the function. If not, the parameter is reported as an error.
@@ -250,7 +280,7 @@ To configure this rule mode (default: `3`):
 ```
 
 ```json
-"@getify/proper-arrows/params": [ "error", { "count": 3 } ]
+"@getify/proper-arrows/params": [ "error", { "count": 3, "trivial": false } ]
 ```
 
 This rule mode counts all parameters to make sure the maximum `count` limit is not violated.
@@ -292,7 +322,7 @@ To configure this rule mode (default: `2`):
 ```
 
 ```json
-"@getify/proper-arrows/params": [ "error", { "length": 2 } ]
+"@getify/proper-arrows/params": [ "error", { "length": 2, "trivial": false } ]
 ```
 
 This rule mode checks all parameters to make sure their basic character length is at least the minimum `"length"` threshold.
@@ -322,7 +352,7 @@ In this statement, the parameter length is below the minimum threshold.
 To configure this rule mode (default: `[]`):
 
 ```json
-"@getify/proper-arrows/params": [ "error", { "allowed": [ "e", "err" ] } ]
+"@getify/proper-arrows/params": [ "error", { "allowed": [ "e", "err" ], "trivial": false } ]
 ```
 
 This exception list prevents any named parameter from being reported as an error by any of this **proper-arrows**/*params* rule's modes.
@@ -343,6 +373,10 @@ To turn this rule on:
 
 ```json
 "@getify/proper-arrows/name": "error"
+```
+
+```json
+"@getify/proper-arrows/name": ["error",{ "trivial": false }]
 ```
 
 The main purpose of this rule is to reduce the impact of the anonymous nature of `=>` arrow function expressions, making them more readable and improving stack trace output. Primarily, this rule disallows `=>` arrow functions passed directly as inline function expression arguments, as well as returned directly from other functions.
@@ -407,7 +441,7 @@ To turn this rule on:
 ```
 
 ```json
-"@getify/proper-arrows/return": [ "error", { "object": true, "chained": true } ]
+"@getify/proper-arrows/return": [ "error", { "object": true, "chained": true, "trivial": false } ]
 ```
 
 The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring concise return values are clean and "proper".
@@ -449,7 +483,7 @@ The **proper-arrows**/*return* rule's `"object"` mode is different (more narrowl
 To configure this rule mode (defaults to on):
 
 ```json
-"@getify/proper-arrows/return": [ "error", { "object": true } ]
+"@getify/proper-arrows/return": [ "error", { "object": true, "trivial": false } ]
 ```
 
 If returning an object literal from an `=>` arrow function, use the full-body return form:
@@ -473,7 +507,7 @@ In this snippet, the `=>` arrow function uses the concise-expression-body form w
 To configure this rule mode (defaults to on):
 
 ```json
-"@getify/proper-arrows/return": [ "error", { "chained": true } ]
+"@getify/proper-arrows/return": [ "error", { "chained": true, "trivial": false } ]
 ```
 
 This rule mode requires `( .. )` surrounding any concise return that is itself an `=>` arrow function, because the parentheses help visually disambiguate where the function boundaries are, especially when there are several `=>` arrow functions chained together.
@@ -512,6 +546,10 @@ To turn this rule on:
 
 ```json
 "@getify/proper-arrows/this": "error"
+```
+
+```json
+"@getify/proper-arrows/this": [ "error", "always", { "no-global": true, "trivial": false } ]
 ```
 
 The main purpose of this rule is to avoid usage of `=>` arrow functions as just function shorthand (i.e., `arr.map(x => x * 2)`), which can be argued is a misusage. Concise `=>` arrow function syntax (with all its myriad variations) can harm readability, so instead `=>` arrow functions should only be used when the "lexical this" behavior is needed.
@@ -579,7 +617,7 @@ To configure this rule mode (default):
 ```
 
 ```json
-"@getify/proper-arrows/this": [ "error", "nested", { "no-global": true } ]
+"@getify/proper-arrows/this": [ "error", "nested", { "no-global": true, "trivial": false } ]
 ```
 
 This rule mode allows a `this` to appear either in the `=>` arrow function, or nested deeper in a chain of `=>` arrow functions, as long as there is **no non-arrow function boundary crossed in the nesting**.
@@ -647,7 +685,7 @@ To configure this rule mode:
 ```
 
 ```json
-"@getify/proper-arrows/this": [ "error", "always", { "no-global": true } ]
+"@getify/proper-arrows/this": [ "error", "always", { "no-global": true, "trivial": false } ]
 ```
 
 This rule mode requires a `this` reference to appear in every single `=>` arrow function (e.g., nested `this` is not sufficient).
@@ -726,7 +764,7 @@ var c = d => e => this.foo(e);
 var f = g => foo(h => this.bar(h));
 ```
 
-**Note:** The `"no-global"` option is not applicable and has no effect for this rule mode.
+**Note:** The `"no-global"` option and [`"trivial"` option](#trivial--arrow-functions) are not applicable and have no effect for this rule mode.
 
 ## npm Package
 

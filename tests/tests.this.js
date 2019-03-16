@@ -3,27 +3,27 @@
 var linterOptions = {
 	thisDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error",], },
+		rules: { "@getify/proper-arrows/this": "error", },
 	},
 	thisAlways: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","always",], },
+		rules: { "@getify/proper-arrows/this": ["error","always",{trivial:true,},], },
 	},
 	thisNested: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","nested",], },
+		rules: { "@getify/proper-arrows/this": ["error","nested",{trivial:true,},], },
 	},
 	thisAlwaysNoGlobal: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,},], },
+		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,trivial:true,},], },
 	},
 	thisAlwaysNoGlobalNodeCommonJS: {
 		parserOptions: { ecmaVersion: 2015, ecmaFeatures: { globalReturn: true, }, },
-		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,},], },
+		rules: { "@getify/proper-arrows/this": ["error","always",{"no-global": true,trivial:true,},], },
 	},
 	thisNestedNoGlobal: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/this": ["error","nested",{"no-global": true,},], },
+		rules: { "@getify/proper-arrows/this": ["error","nested",{"no-global": true,trivial:true,},], },
 	},
 	thisNever: {
 		parserOptions: { ecmaVersion: 2015, },
@@ -638,7 +638,7 @@ QUnit.test( "THIS (default: nested): two separate arrows, both this", function t
 
 QUnit.test( "THIS (default: nested): simple arrow, no this", function test(assert){
 	var code = `
-		var x = y => y;
+		var x = y => y + 1;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.thisDefault );
@@ -683,7 +683,7 @@ QUnit.test( "THIS (default: nested): two nested arrows, one this nested", functi
 
 QUnit.test( "THIS (default: nested): two nested arrows, one this not-nested", function test(assert){
 	var code = `
-		var x = y => this.foo(z => z);
+		var x = y => this.foo(z => z + 1);
 	`;
 
 	var results = eslinter.verify( code, linterOptions.thisDefault );
@@ -697,7 +697,7 @@ QUnit.test( "THIS (default: nested): two nested arrows, one this not-nested", fu
 
 QUnit.test( "THIS (default: nested): two nested arrows, no this", function test(assert){
 	var code = `
-		var x = y => z => z;
+		var x = y => z => z + 1;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.thisDefault );

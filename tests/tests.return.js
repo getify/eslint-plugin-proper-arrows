@@ -7,19 +7,19 @@ var linterOptions = {
 	},
 	returnObjectDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{chained:false,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{chained:false,trivial:true,},], },
 	},
 	returnObject: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,trivial:true,},], },
 	},
 	returnChainedDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,trivial:true,},], },
 	},
 	returnChained: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,trivial:true,},], },
 	},
 };
 

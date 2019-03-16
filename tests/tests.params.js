@@ -7,39 +7,39 @@ var linterOptions = {
 	},
 	paramsUnusedAllDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { count: 1000, length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{count: 1000,length:0,trivial:true,},], },
 	},
 	paramsUnusedAll: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "all", count: 1000, length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"all",count:1000,length:0,trivial:true,},], },
 	},
 	paramsUnusedTrailing: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "trailing", count: 1000, length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"trailing",count:1000,length:0,trivial:true,},], },
 	},
 	paramsUnusedNone: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "none", count: 1000, length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"none",count:1000,length:0,trivial:true,},], },
 	},
 	paramsCountDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "none", length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"none",length:0,trivial:true,},], },
 	},
 	paramsCount0: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "none", count: 0, length: 0, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"none",count:0,length:0,trivial:true,},], },
 	},
 	paramsLengthDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "none", count: 1000, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"none",count:1000,trivial:true,},], },
 	},
 	paramsLength1: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { unused: "none", count: 1000, length: 1, }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{unused:"none",count:1000,length:1,trivial:true,},], },
 	},
 	paramsAllowed: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/params": [ "error", { allowed: [], }, ], },
+		rules: { "@getify/proper-arrows/params": ["error",{allowed:[],trivial:true,},], },
 	},
 };
 

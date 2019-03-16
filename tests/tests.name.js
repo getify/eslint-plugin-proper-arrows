@@ -3,7 +3,7 @@
 var linterOptions = {
 	name: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/name": "error", },
+		rules: { "@getify/proper-arrows/name": ["error",{trivial:true,},], },
 	},
 };
 
