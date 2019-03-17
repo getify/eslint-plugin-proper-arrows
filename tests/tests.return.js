@@ -7,27 +7,39 @@ var linterOptions = {
 	},
 	returnObjectDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{chained:false,sequence:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{ternary:1000,chained:false,sequence:false,trivial:true,},], },
 	},
 	returnObject: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:true,chained:false,sequence:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:true,ternary:1000,chained:false,sequence:false,trivial:true,},], },
+	},
+	returnTernaryDefault: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:false,sequence:false,trivial:true,},], },
+	},
+	returnTernary1: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:1,chained:false,sequence:false,trivial:true,},], },
+	},
+	returnTernary2: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:2,chained:false,sequence:false,trivial:true,},], },
 	},
 	returnChainedDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,sequence:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:1000,sequence:false,trivial:true,},], },
 	},
 	returnChained: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:true,sequence:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:1000,chained:true,sequence:false,trivial:true,},], },
 	},
 	returnSequenceDefault: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:false,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:1000,chained:false,trivial:true,},], },
 	},
 	returnSequence: {
 		parserOptions: { ecmaVersion: 2015, },
-		rules: { "@getify/proper-arrows/return": ["error",{object:false,chained:false,sequence:true,trivial:true,},], },
+		rules: { "@getify/proper-arrows/return": ["error",{object:false,ternary:1000,chained:false,sequence:true,trivial:true,},], },
 	},
 };
 
@@ -90,6 +102,82 @@ QUnit.test( "RETURN (object, default): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
 	assert.strictEqual( messageId, "noConciseObject", "messageId" );
+} );
+
+QUnit.test( "RETURN (ternary, default): conforming", function test(assert){
+	var code = `
+		var x = (y = a ? a : 1) => { return x ? x : y; };
+		var w = g ? g : 1;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernaryDefault );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (ternary, default): violating", function test(assert){
+	var code = `
+		var x = y => x ? x : y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernaryDefault );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noTernary", "messageId" );
+} );
+
+QUnit.test( "RETURN (ternary:1): conforming", function test(assert){
+	var code = `
+		var x = y => x ? x : y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernary1 );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (ternary:1): violating", function test(assert){
+	var code = `
+		var x = y => x ? x : y ? y : 42;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernary1 );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noTernary", "messageId" );
+} );
+
+QUnit.test( "RETURN (ternary:2): conforming", function test(assert){
+	var code = `
+		var x = y => x ? x : y ? y : 42;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernary2 );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "RETURN (ternary:2): violating", function test(assert){
+	var code = `
+		var x = y => x ? x : y ? z ? z : 42 : null;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.returnTernary2 );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/return", "ruleId" );
+	assert.strictEqual( messageId, "noTernary", "messageId" );
 } );
 
 QUnit.test( "RETURN (object): conforming", function test(assert){

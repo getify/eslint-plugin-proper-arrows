@@ -20,7 +20,7 @@ The rules defined in this plugin:
 
 * [`"location"`](#rule-location): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
 
-* [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding chained `=>` arrow function concise returns (`x => y => z => ..`), etc.
+* [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding concise returns of conditional/ternary expressions (`x => x ? y : z`), etc.
 
 * [`"this"`](#rule-this): requires/disallows `=>` arrow functions using a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function.
 
@@ -635,6 +635,8 @@ The **proper-arrows**/*return* rule can be configured with three (non-exclusive)
 
 * [`"object"`](#rule-return-configuration-object) (default: `true`) forbids returning object literals as concise return expressions.
 
+* [`"ternary"`](#rule-return-configuration-ternary) (default: `0`) controls whether (and to what level of nesting) conditional/ternary expressions (`x ? y : z`) are allowed as the concise return expression of an `=>` arrow function.
+
 * [`"chained"`](#rule-return-configuration-chained) (default: `true`) forbids returning `=>` arrow functions (aka, "chained arrow returns") as concise return expressions, without visual delimiters `( .. )`.
 
 * [`"sequence"`](#rule-return-configuration-sequence) (default: `true`) forbids returning comma sequences (ie, `(x = 3, y + x)`) as concise return expressions.
@@ -666,6 +668,32 @@ var fn = prop => val => ({ [prop]: val });
 ```
 
 In this snippet, the `=>` arrow function has an object literal as the concise return expression.
+
+#### Rule `"return"` Configuration: `"ternary"`
+
+**Note:** This rule is similar to the [built-in ESLint "no-ternary" rule](https://eslint.org/docs/rules/no-ternary) and ["no-nested-ternary" rule](https://eslint.org/docs/rules/no-nested-ternary). However, those built-in rules focus on all conditional/ternary (`? :`) expressions, and aren't configurable to an allowed level of nesting.
+
+The **proper-arrows**/*return* rule's `"ternary"` mode is different (more narrowly focused): it only controls the ternary/conditional expressions as the concise return of an `=>` arrow function; otherwise, it doesn't place any requirements or restrictions on ternary/conditional expressions.
+
+To configure this rule mode (defaults to `0`, set to a higher number to effectively disable):
+
+```json
+"@getify/proper-arrows/return": [ "error", { "ternary": 1, "trivial": false } ]
+```
+
+The number specified for the `"ternary"` option controls what level of (nested) ternary/conditional expressions are allowed as the concise return of an `=>` arrow function. `0` means none allowed, `1` means a single ternary/conditional allowed, `2` means one level nested (`x ? y ? z : w : u`) allowed, etc.
+
+If this rule mode is set to `1`, it would pass this snippet:
+
+```js
+var fn = data => data.id ? lookup(data.id) : lookup(-1);
+```
+
+But this rule mode set to `1` *would* report errors for:
+
+```js
+var fn = data => data.id ? data.extra ? lookup(data.id,data.extra) : lookup(data.id) : lookup(-1);
+```
 
 #### Rule `"return"` Configuration: `"chained"`
 
