@@ -16,7 +16,7 @@ The rules defined in this plugin:
 
 * [`"name"`](#rule-name): requires `=>` arrow functions to only be used in positions where they receive an inferred name (i.e., assigned to a variable or property, etc), to avoid the poor readbility/debuggability of anonymous function expressions.
 
-   **Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
+   **Note:** This rule is like the "as-needed" mode of the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), but applied to `=>` arrow functions; the built-in rule ignores them.
 
 * [`"location"`](#rule-location): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
 
@@ -194,7 +194,7 @@ To turn this rule on:
 
 The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring the parameters are clean and "proper".
 
-By forbidding unused parameters, the reader is not confused searching for their usage. By requiring parameters that are long enough to be meaningful names, the reader understands the function better. By limiting the number of parameters, the reader is more easily able to visually distinguish the whole function definition.
+By forbidding unused parameters, the reader is not confused searching for their usage. By requiring parameters that are long enough to have meaningful names, the reader can understand the function better. By limiting the number of parameters, the reader can more easily visually distinguish the whole function definition.
 
 For example:
 
@@ -228,7 +228,7 @@ The **proper-arrows**/*params* rule can be configured with any combination of th
 
 #### Rule `"params"` Configuration: `"unused"`
 
-**Note:** This "unused" rule mode resembles the [built-in "no-unused-vars" rule](https://eslint.org/docs/rules/no-unused-vars), but instead focuses only on the parameters of `=>` arrow functions.
+**Note:** This rule mode resembles the [built-in "no-unused-vars" rule](https://eslint.org/docs/rules/no-unused-vars), but instead focuses only on the parameters of `=>` arrow functions.
 
 To configure this rule mode (default: `"all"`):
 
@@ -320,11 +320,11 @@ var fn4 = (one,two,three,four) => one + two * three / four;
 var fn4b = (one,two,three,...four) => one + two * three / four[0];
 ```
 
-In each statement, the parameter count is is above the limit.
+In each statement, the parameter count is above the limit.
 
 #### Rule `"params"` Configuration: `"length"`
 
-**Note:** This "length" rule mode resembles the [built-in ESLint "id-length" rule](https://eslint.org/docs/rules/id-length), but instead focuses only on the parameters of `=>` arrow functions.
+**Note:** This rule mode resembles the [built-in ESLint "id-length" rule](https://eslint.org/docs/rules/id-length), but instead focuses only on the parameters of `=>` arrow functions.
 
 To configure this rule mode (default: `2`):
 
@@ -348,7 +348,7 @@ var fn1 = (data) => data.id;
 var fn2 = (user,cb) => ajax(user,cb);
 ```
 
-These statements all report no errors, because all parameters at least the length threshold specified (default: `2`), and the absence of a parameter is ignored.
+These statements all report no errors, because all parameters are at least the length threshold specified (default: `2`), and the absence of a parameter is ignored.
 
 By contrast, this rule *would* report errors for:
 
@@ -356,17 +356,17 @@ By contrast, this rule *would* report errors for:
 users.map(v => v * 2);
 ```
 
-In this statement, the parameter length is below the minimum threshold.
+In this statement, the parameter length of `v` is below the minimum threshold.
 
 #### Rule `"params"` Configuration: `"allowed"`
 
-To configure this rule mode (default: `[]`):
+To configure named exceptions to the main three rule modes (default: `[]`):
 
 ```json
 "@getify/proper-arrows/params": [ "error", { "allowed": [ "e", "err" ], "trivial": false } ]
 ```
 
-This exception list prevents any named parameter from being reported as an error by any of this **proper-arrows**/*params* rule's modes.
+This exception list prevents any listed parameter from being reported as an error by any of this **proper-arrows**/*params* rule's modes.
 
 For example:
 
@@ -374,7 +374,7 @@ For example:
 var fn = (one,two,three,e) => 0;
 ```
 
-Normally, `e` would hit all 3 errors: it's unused, it's beyond the default count limit, and it's below the minimum length threshold. However, no errors will be reported if `"e"` is included in the `"allowed"` exception list.
+By default, `e` would report all 3 errors: it's unused, it's beyond the default count limit, and it's below the minimum length threshold. However, no errors will be reported if `"e"` is included in the `"allowed"` exception list.
 
 ## Rule: `"name"`
 
@@ -390,11 +390,11 @@ To turn this rule on:
 "@getify/proper-arrows/name": ["error",{ "trivial": false }]
 ```
 
-The main purpose of this rule is to reduce the impact of the anonymous nature of `=>` arrow function expressions, making them more readable and improving stack trace output. Primarily, this rule disallows `=>` arrow functions passed directly as inline function expression arguments, as well as returned directly from other functions.
+The main purpose of this rule is to reduce the impact of the anonymous nature of `=>` arrow function expressions, making them more readable, improving stack trace output, and giving them a named self-reference (recursion, event unbinding, etc). Primarily, this rule disallows `=>` arrow functions passed directly as inline function expression arguments, as well as returned directly from other functions.
 
-**Note:** This rule is like the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), specifically its "as-needed" mode, but applied to `=>` arrow functions, since the built-in rule does not.
+**Note:** This rule is like the "as-needed" mode of the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), but applied to `=>` arrow functions; the built-in rule ignores them.
 
-Before being used (passed, called, returned, etc), `=>` arrow functions should be assigned to a variable/property/etc to receive a name inference:
+Before being used (passed, called, returned, etc), `=>` arrow functions should be assigned somewhere, to receive a name inference:
 
 ```js
 function multiplier(x) {
@@ -420,7 +420,7 @@ fns.quadrupled.name;          // "quadrupled"
 
 In this snippet, each `=>` arrow function is first assigned to a variable or property, giving it an inferred name (`"multipledBy"`, `"tripled"`, or `"quadrupled"`). As such, they would all pass this rule.
 
-By contrast, this rule *would* report errors for:
+By contrast, this rule *would* report errors for each of the `=>` arrow functions here:
 
 ```js
 function getName(fn) {
@@ -437,13 +437,13 @@ getName( fns[1] );         // ""
 getName( v => v * 4 );     // ""
 ```
 
-In this snippet, all three `=>` arrow functions are anonymous (no name inference possible).
+In this snippet, all three `=>` arrow functions remain anonymous because no name inferences are possible.
 
 ## Rule: `"location"`
 
 The **proper-arrows**/*location* rule restricts where in program structure `=>` arrow functions can be used.
 
-This rule can be configured to forbid `=>` arrow functions in the top-level/global scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and `=>` arrow functions in `export` statements (`"export"`).
+This rule can be configured to forbid `=>` arrow functions in the top-level/global scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
 
 To turn this rule on:
 
@@ -457,7 +457,7 @@ To turn this rule on:
 
 The main purpose of this rule is to avoid readability harm when using `=>` arrow functions in certain program structure locations.
 
-Placing `=>` arrow functions in the top-level/global scope has no benefit other than preferred style, and are more proper as regular function declarations. Placing `=>` arrow functions on object properties has no benefit other than preferred style, and are more proper as concise object methods. Placing arrow functions in `export` statements offers no benefit other than being more concise, and are more proper as exported named function declarations.
+Placing `=>` arrow functions in the top-level/global scope has no benefit other than preferred style; they're more proper as regular function declarations. Placing `=>` arrow functions on object properties has no benefit other than preferred style; they're more proper as concise object methods. Placing arrow functions in `export` statements offers no benefit other than being more concise; they're more proper as exported named function declarations.
 
 For example:
 
@@ -497,7 +497,7 @@ var onData = data => {
 export default id => People.getData(id,onData)
 ```
 
-None of these usages of `=>` arrow functions are helping the readability or behavior of this snippet.
+These usages of `=>` arrow functions are not helping the readability or behavior of this snippet.
 
 ### Rule Configuration
 
@@ -513,7 +513,7 @@ The **proper-arrows**/*location* rule can be configured with three (non-exclusiv
 
 #### Rule `"location"` Configuration: `"global"`
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/location": [ "error", { "global": true, "trivial": false } ]
@@ -539,13 +539,13 @@ In this snippet, the `=>` arrow function is less obviously a function than the f
 
 #### Rule `"location"` Configuration: `"property"`
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/location": [ "error", { "property": true, "trivial": false } ]
 ```
 
-When defining a method on an object literal, use the concise method form:
+When defining a function in an object literal definition, use the concise method form:
 
 ```js
 var People = {
@@ -567,13 +567,13 @@ In this snippet, the  `=>` arrow function is less obviously a method than the co
 
 #### Rule `"location"` Configuration: `"export"`
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/location": [ "error", { "export": true, "trivial": false } ]
 ```
 
-When exporting a function expression, use a named function expression:
+When exporting a function declaration, use a named function:
 
 ```js
 export default function lookup(id) {
@@ -587,13 +587,13 @@ By contrast, this rule mode *would* report errors for:
 export default id => People.getData(id,onData)
 ```
 
-In this snippet, the `=>` arrow function is less obviously a function expression than named function expression form.
+In this snippet, the `=>` arrow function is less obviously a function than named function form.
 
 ## Rule: `"return"`
 
-The **proper-arrows**/*return* rule restricts the concise return value kind for `=>` arrow functions.
+The **proper-arrows**/*return* rule restricts the concise return values for `=>` arrow functions.
 
-This rule can be configured to forbid concise returns of object literals (`"object"`), forbid concise returns of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`), and forbid concise returns of comma sequences (`"sequence"`).
+This rule can be configured to forbid concise return of object literals (`"object"`), forbid concise return of `=>` arrow functions (aka, "chained arrow returns") without visual delimiters like `( .. )` (`"chained"`), forbid concise return of ternary/conditional expressions (`"ternary"`), and forbid concise returns of comma sequences (`"sequence"`).
 
 To turn this rule on:
 
@@ -607,35 +607,64 @@ To turn this rule on:
 
 The main purpose of this rule is to avoid readability harm for `=>` arrow functions by ensuring concise return values are clean and "proper".
 
-By forbidding concise return of object literals, the reader is not confused at first glance by the `{ .. }` looking like a non-concise function body. By forbidding chained `=>` arrow function concise returns without visual delimiters (like `( .. )`), the reader doesn't have to visually parse functions in a reverse/right-to-left fashion to determine the function boundaries. By forbidding concise return of comma sequences (ie, `(x = 3,y = foo(x + 1),[x,y])`), the reader doesn't have trouble figuring out which value will be returned from the function.
+By forbidding concise return of object literals, the reader is not confused at first glance by the `{ .. }` looking like a non-concise function body. By forbidding chained `=>` arrow function concise returns without enclosing visual delimiters (like `( .. )`), the reader doesn't have to visually parse functions in a reverse/right-to-left fashion to determine the function boundaries. By forbidding concise return of comma sequences (ie, `(x = 3,y = foo(x + 1),[x,y])`), the reader doesn't have as much trouble figuring out which value will be returned from the function. By forbidding concise return of ternary/conditional expressions, especially nested ternaries, the function's boundary is not as visually ambiguous.
 
 For example:
 
 ```js
 var fn1 = prop => ( val => { return { [prop]: val }; } );
-var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y] };
+var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y]; };
+var fn3 = (x,y) => {
+    return (
+        x > 3 ? x :
+        y > 3 ? y :
+        3;
+    );
+};
 ```
 
-In this snippet, the chained `=>` arrow function `fn1` is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. For `fn2`, the function body's return value (`[x,y]`) is clear. Therefore, the **proper-arrows**/*return* rule would not report any errors.
+In this snippet, the chained `=>` arrow function `fn1(..)` is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. For `fn2(..)`, the function body's return value (`[x,y]`) is clear. Therefore, the **proper-arrows**/*return* rule would not report any errors. For `fn3(..)`, the presence of a `return` keyword inside the `{ }` function body more clearly delimits the nested ternary/conditional expression as determining the return value.
 
 By contrast, this rule *would* report errors for each of these statements:
 
 ```js
-var fn = prop => val => ({ [prop]: val });
-var fn2 = (x,y) => (x = 3, y = foo(x + 1), [x,y] );
+var fn1 = prop => val => ({ [prop]: val });
+var fn2 = (x,y) => (x = 3, y = foo(x + 1), [x,y]);
+var fn3 = (x,y) => x > 3 ? x : y > 3 ? y : 3;
 ```
 
-Here, the chained `=>` arrow function return is not as clear, the concise return of the object literal can be confused as a function block at first glance, and the concise return of the comma sequence makes it hard to determine which value will actually be returned.
+In this snippet, the chained `=>` arrow function return is not as clear, the concise return of the object literal can be confused as a function block at first glance, the concise return of the comma sequence makes it hard to determine which value will actually be returned, and the nested ternary/conditional expression obscures the determination of the return value.
+
+Some claim that extra whitespace solves these readability issues. However, if you go to the trouble to space/indent to this extent, skipping the `return` keyword doesn't really contribute to the readability, and in fact still makes the return values a little less visually distinct than the above forms.
+
+```js
+var fn1 = prop
+    => val
+        => (
+            { [prop]: val }
+        );
+var fn2 = (x,y) => (
+    x = 3,
+    y = foo(x + 1),
+    [x,y]
+);
+var fn3 = (x,y) =>
+    x > 3 ? x :
+    y > 3 ? y :
+    3;
+```
+
+Also, many proponents of this whitespace "solution" advocate it in theory only; in practice, these sorts of functions are often just found in their less readable single-line form.
 
 ### Rule Configuration
 
-The **proper-arrows**/*return* rule can be configured with three (non-exclusive) modes: `"object"`, `"chained"`, and `"sequence"`.
+The **proper-arrows**/*return* rule can be configured with four (non-exclusive) modes: `"object"`, `"ternary"`, `"chained"`, and `"sequence"`.
 
-**Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
+**Note:** The default behavior is that all four modes are turned on for this rule. You must specifically configure each mode to disable it.
 
 * [`"object"`](#rule-return-configuration-object) (default: `true`) forbids returning object literals as concise return expressions.
 
-* [`"ternary"`](#rule-return-configuration-ternary) (default: `0`) controls whether (and to what level of nesting) conditional/ternary expressions (`x ? y : z`) are allowed as the concise return expression of an `=>` arrow function.
+* [`"ternary"`](#rule-return-configuration-ternary) (default: `0`) controls whether (and to what extent of nesting) conditional/ternary expressions (`x ? y : z`) are allowed as the concise return expression of an `=>` arrow function.
 
 * [`"chained"`](#rule-return-configuration-chained) (default: `true`) forbids returning `=>` arrow functions (aka, "chained arrow returns") as concise return expressions, without visual delimiters `( .. )`.
 
@@ -647,7 +676,7 @@ The **proper-arrows**/*return* rule can be configured with three (non-exclusive)
 
 The **proper-arrows**/*return* rule's `"object"` mode is different (more narrowly focused): it only disallows the concise return of an object literal; otherwise, it doesn't place any requirements or restrictions on usage of `=>` arrow functions.
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/return": [ "error", { "object": true, "trivial": false } ]
@@ -697,7 +726,7 @@ var fn = data => data.id ? data.extra ? lookup(data.id,data.extra) : lookup(data
 
 #### Rule `"return"` Configuration: `"chained"`
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/return": [ "error", { "chained": true, "trivial": false } ]
@@ -737,7 +766,7 @@ In this snippet, the boundary of the chained `=>` arrow function return is less 
 
 The **proper-arrows**/*return* rule's `"sequence"` mode is different (more narrowly focused): it only disallows comma sequences as `=>` arrow function concise return expressions.
 
-To configure this rule mode (defaults to on, set as `false` to turn off):
+To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
 "@getify/proper-arrows/return": [ "error", { "sequence": true, "trivial": false } ]
