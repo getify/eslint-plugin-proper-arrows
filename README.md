@@ -1,4 +1,4 @@
-# ESLint Rule: proper-arrows
+# ESLint Plugin: proper-arrows
 
 [![Build Status](https://travis-ci.org/getify/eslint-plugin-proper-arrows.svg?branch=master)](https://travis-ci.org/getify/eslint-plugin-proper-arrows)
 [![npm Module](https://badge.fury.io/js/%40getify%2Feslint-plugin-proper-arrows.svg)](https://www.npmjs.org/package/@getify/eslint-plugin-proper-arrows)
@@ -623,7 +623,7 @@ var fn3 = (x,y) => {
 };
 ```
 
-In this snippet, the chained `=>` arrow function `fn1(..)` is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. For `fn2(..)`, the function body's return value (`[x,y]`) is clear. Therefore, the **proper-arrows**/*return* rule would not report any errors. For `fn3(..)`, the presence of a `return` keyword inside the `{ }` function body more clearly delimits the nested ternary/conditional expression as determining the return value.
+In this snippet, the chained `=>` arrow function `fn1(..)` is surrounded by `( .. )` to visually delimit it, and the object literal being returned is done with a full function body and `return` keyword. For `fn2(..)`, the function body's return value (`[x,y]`) is clear. For `fn3(..)`, the presence of a `return` keyword inside the `{ }` function body more clearly delimits the nested ternary/conditional expression as determining the return value. Therefore, the **proper-arrows**/*return* rule would not report any errors.
 
 By contrast, this rule *would* report errors for each of these statements:
 
@@ -777,7 +777,7 @@ Comma sequences are not very common, but one place they're a bit more common is 
 For example:
 
 ```js
-var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y] };
+var fn2 = (x,y) => { x = 3; y = foo(x + 1); return [x,y]; };
 ```
 
 In this snippet, the `=>` arrow function uses the full-body return form with separate statements and an explicit `return` statement. As such, it would pass this rule.
