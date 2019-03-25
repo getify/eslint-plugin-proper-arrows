@@ -22,7 +22,7 @@ else {
 
 eslinter.defineRule("@getify/proper-arrows/params",properArrows.rules.params);
 eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules.name);
-eslinter.defineRule("@getify/proper-arrows/location",properArrows.rules.location);
+eslinter.defineRule("@getify/proper-arrows/where",properArrows.rules.where);
 eslinter.defineRule("@getify/proper-arrows/return",properArrows.rules.return);
 eslinter.defineRule("@getify/proper-arrows/this",properArrows.rules.this);
 

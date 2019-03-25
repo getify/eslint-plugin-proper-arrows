@@ -6,7 +6,7 @@ var linterOptions = {
 		rules: {
 			"@getify/proper-arrows/params": "error",
 			"@getify/proper-arrows/name": "error",
-			"@getify/proper-arrows/location": "error",
+			"@getify/proper-arrows/where": "error",
 			"@getify/proper-arrows/return": "error",
 			"@getify/proper-arrows/this": "error",
 		},
@@ -16,7 +16,7 @@ var linterOptions = {
 		rules: {
 			"@getify/proper-arrows/params": ["error",{trivial:true,},],
 			"@getify/proper-arrows/name": ["error",{trivial:true,},],
-			"@getify/proper-arrows/location": ["error",{trivial:true,},],
+			"@getify/proper-arrows/where": ["error",{trivial:true,},],
 			"@getify/proper-arrows/return": ["error",{trivial:true,},],
 			"@getify/proper-arrows/this": ["error","nested",{trivial:true,},],
 		},
@@ -24,13 +24,13 @@ var linterOptions = {
 	trivialModuleDefault: {
 		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
 		rules: {
-			"@getify/proper-arrows/location": "error",
+			"@getify/proper-arrows/where": "error",
 		},
 	},
 	trivialModule: {
 		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
 		rules: {
-			"@getify/proper-arrows/location": ["error",{trivial:true,},],
+			"@getify/proper-arrows/where": ["error",{trivial:true,},],
 		},
 	},
 };
@@ -189,6 +189,6 @@ QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(as
 
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
-	assert.strictEqual( ruleId, "@getify/proper-arrows/location", "ruleId" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
 	assert.strictEqual( messageId, "noExport", "messageId" );
 } );
