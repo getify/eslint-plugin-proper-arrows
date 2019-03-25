@@ -18,7 +18,7 @@ The rules defined in this plugin:
 
    **Note:** This rule is like the "as-needed" mode of the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), but applied to `=>` arrow functions; the built-in rule ignores them.
 
-* [`"location"`](#rule-location): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
+* [`"where"`](#rule-where): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
 
 * [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding concise returns of conditional/ternary expressions (`x => x ? y : z`), etc.
 
@@ -71,7 +71,7 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
 "rules": {
     "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
     "@getify/proper-arrows/name": ["error",{"trivial":false}],
-    "@getify/proper-arrows/location": ["error",{"global":true}],
+    "@getify/proper-arrows/where": ["error",{"global":true}],
     "@getify/proper-arrows/return": ["error",{"object":true}],
     "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
 }
@@ -109,7 +109,7 @@ eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/name: [
 ```
 
 ```cmd
-eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/location: [error,{"global":true}]' ..
+eslint .. --plugin='@getify/proper-arrows' --rule='@getify/proper-arrows/where: [error,{"global":true}]' ..
 ```
 
 ```cmd
@@ -135,7 +135,7 @@ eslinter.defineRule("@getify/proper-arrows/params",properArrows.rules.params);
 
 eslinter.defineRule("@getify/proper-arrows/name",properArrows.rules.name);
 
-eslinter.defineRule("@getify/proper-arrows/location",properArrows.rules.location);
+eslinter.defineRule("@getify/proper-arrows/where",properArrows.rules.where);
 
 eslinter.defineRule("@getify/proper-arrows/return",properArrows.rules.return);
 
@@ -149,7 +149,7 @@ eslinter.verify(".. some code ..",{
     rules: {
         "@getify/proper-arrows/params": ["error",{unused:"trailing"}],
         "@getify/proper-arrows/name": ["error",{trivial:false}],
-        "@getify/proper-arrows/location": ["error",{trivial:true}],
+        "@getify/proper-arrows/where": ["error",{trivial:true}],
         "@getify/proper-arrows/return": ["error",{object:true}],
         "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
     }
@@ -439,20 +439,20 @@ getName( v => v * 4 );     // ""
 
 In this snippet, all three `=>` arrow functions remain anonymous because no name inferences are possible.
 
-## Rule: `"location"`
+## Rule: `"where"`
 
-The **proper-arrows**/*location* rule restricts where in program structure `=>` arrow functions can be used.
+The **proper-arrows**/*where* rule restricts where in program structure `=>` arrow functions can be used.
 
 This rule can be configured to forbid `=>` arrow functions in the top-level/global scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
 
 To turn this rule on:
 
 ```json
-"@getify/proper-arrows/location": "error"
+"@getify/proper-arrows/where": "error"
 ```
 
 ```json
-"@getify/proper-arrows/location": [ "error", { "global": true, "property": true, "export": true, "trivial": false } ]
+"@getify/proper-arrows/where": [ "error", { "global": true, "property": true, "export": true, "trivial": false } ]
 ```
 
 The main purpose of this rule is to avoid readability harm when using `=>` arrow functions in certain program structure locations.
@@ -479,7 +479,7 @@ export default function lookup(id) {
 }
 ```
 
-In this snippet, the `getData(..)` function is a clear and proper concise method on `People` object, `onData(..)` is a regular function declaration, and `lookup(..)` is a named export declaration. Therefore, the **proper-arrows**/*location* rule would not report any errors.
+In this snippet, the `getData(..)` function is a clear and proper concise method on `People` object, `onData(..)` is a regular function declaration, and `lookup(..)` is a named export declaration. Therefore, the **proper-arrows**/*where* rule would not report any errors.
 
 By contrast, this rule *would* default to reporting errors for each of these `=>` arrow functions:
 
@@ -501,22 +501,22 @@ These usages of `=>` arrow functions are not helping the readability or behavior
 
 ### Rule Configuration
 
-The **proper-arrows**/*location* rule can be configured with three (non-exclusive) modes: `"global"`, `"property"`, and `"export"`.
+The **proper-arrows**/*where* rule can be configured with three (non-exclusive) modes: `"global"`, `"property"`, and `"export"`.
 
 **Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
 
-* [`"global"`](#rule-location-configuration-global) (default: `true`) forbids `=>` arrow functions in the top-level/global scope.
+* [`"global"`](#rule-where-configuration-global) (default: `true`) forbids `=>` arrow functions in the top-level/global scope.
 
-* [`"property"`](#rule-location-configuration-property) (default: `true`) forbids assigning `=>` arrow functions to object properties.
+* [`"property"`](#rule-where-configuration-property) (default: `true`) forbids assigning `=>` arrow functions to object properties.
 
-* [`"export"`](#rule-location-configuration-export) (default: `true`) forbids `=>` arrow functions in `export` statements.
+* [`"export"`](#rule-where-configuration-export) (default: `true`) forbids `=>` arrow functions in `export` statements.
 
-#### Rule `"location"` Configuration: `"global"`
+#### Rule `"where"` Configuration: `"global"`
 
 To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
-"@getify/proper-arrows/location": [ "error", { "global": true, "trivial": false } ]
+"@getify/proper-arrows/where": [ "error", { "global": true, "trivial": false } ]
 ```
 
 When defining functions at the top-level/global scope, use a regular function declaration:
@@ -537,12 +537,12 @@ var onData = data => {
 
 In this snippet, the `=>` arrow function is less obviously a function than the function declaration form.
 
-#### Rule `"location"` Configuration: `"property"`
+#### Rule `"where"` Configuration: `"property"`
 
 To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
-"@getify/proper-arrows/location": [ "error", { "property": true, "trivial": false } ]
+"@getify/proper-arrows/where": [ "error", { "property": true, "trivial": false } ]
 ```
 
 When defining a function in an object literal definition, use the concise method form:
@@ -565,12 +565,12 @@ var People = {
 
 In this snippet, the  `=>` arrow function is less obviously a method than the concise method form.
 
-#### Rule `"location"` Configuration: `"export"`
+#### Rule `"where"` Configuration: `"export"`
 
 To configure this rule mode (on by default, set as `false` to turn off):
 
 ```json
-"@getify/proper-arrows/location": [ "error", { "export": true, "trivial": false } ]
+"@getify/proper-arrows/where": [ "error", { "export": true, "trivial": false } ]
 ```
 
 When exporting a function declaration, use a named function:

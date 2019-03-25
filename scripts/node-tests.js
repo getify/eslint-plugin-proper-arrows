@@ -31,7 +31,7 @@ global.QUnit = require("qunit");
 require(path.join("..","tests","qunit.config.js"));
 require(path.join("..","tests","tests.params.js"));
 require(path.join("..","tests","tests.name.js"));
-require(path.join("..","tests","tests.location.js"));
+require(path.join("..","tests","tests.where.js"));
 require(path.join("..","tests","tests.return.js"));
 require(path.join("..","tests","tests.this.js"));
 require(path.join("..","tests","tests.trivial.js"));
