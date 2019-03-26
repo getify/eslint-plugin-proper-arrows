@@ -46,7 +46,7 @@ var linterOptions = {
 QUnit.test( "PARAMS (default): conforming", function test(assert){
 	var code = `
 		var f = xx => xx * 2;
-		var p = ([yy,zz]) => yy * zz;
+		var p = ([yy,,zz]) => yy * zz;
 		var r = ({ ww, G: gg }) => ww * gg;
 	`;
 
