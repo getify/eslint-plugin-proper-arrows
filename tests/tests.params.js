@@ -182,34 +182,34 @@ QUnit.test( "PARAMS (unused: all): violating | nesting, shadowing", function tes
 	assert.strictEqual( results.length, 10, "only 10 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/params", "ruleId1" );
 	assert.strictEqual( messageId1, "unused", "messageId1" );
-	assert.ok( /`x`/.test(message1), "message1" );
+	assert.ok( message1.includes("`x`"), "message1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/params", "ruleId2" );
 	assert.strictEqual( messageId2, "unused", "messageId2" );
-	assert.ok( /`y`/.test(message2), "message2" );
+	assert.ok( message2.includes("`y`"), "message2" );
 	assert.strictEqual( ruleId3, "@getify/proper-arrows/params", "ruleId3" );
 	assert.strictEqual( messageId3, "unused", "messageId3" );
-	assert.ok( /`z`/.test(message3), "message3" );
+	assert.ok( message3.includes("`z`"), "message3" );
 	assert.strictEqual( ruleId4, "@getify/proper-arrows/params", "ruleId4" );
 	assert.strictEqual( messageId4, "unused", "messageId4" );
-	assert.ok( /`w`/.test(message4), "message4" );
+	assert.ok( message4.includes("`w`"), "message4" );
 	assert.strictEqual( ruleId5, "@getify/proper-arrows/params", "ruleId5" );
 	assert.strictEqual( messageId5, "unused", "messageId5" );
-	assert.ok( /`r`/.test(message5), "message5" );
+	assert.ok( message5.includes("`r`"), "message5" );
 	assert.strictEqual( ruleId6, "@getify/proper-arrows/params", "ruleId6" );
 	assert.strictEqual( messageId6, "unused", "messageId6" );
-	assert.ok( /`k`/.test(message6), "message6" );
+	assert.ok( message6.includes("`k`"), "message6" );
 	assert.strictEqual( ruleId7, "@getify/proper-arrows/params", "ruleId7" );
 	assert.strictEqual( messageId7, "unused", "messageId7" );
-	assert.ok( /`a`/.test(message7), "message7" );
+	assert.ok( message7.includes("`a`"), "message7" );
 	assert.strictEqual( ruleId8, "@getify/proper-arrows/params", "ruleId8" );
 	assert.strictEqual( messageId8, "unused", "messageId8" );
-	assert.ok( /`s`/.test(message8), "message8" );
+	assert.ok( message8.includes("`s`"), "message8" );
 	assert.strictEqual( ruleId9, "@getify/proper-arrows/params", "ruleId9" );
 	assert.strictEqual( messageId9, "unused", "messageId9" );
-	assert.ok( /`d`/.test(message9), "message9" );
+	assert.ok( message9.includes("`d`"), "message9" );
 	assert.strictEqual( ruleId10, "@getify/proper-arrows/params", "ruleId10" );
 	assert.strictEqual( messageId10, "unused", "messageId10" );
-	assert.ok( /`g`/.test(message10), "message10" );
+	assert.ok( message10.includes("`g`"), "message10" );
 } );
 
 QUnit.test( "PARAMS (unused: trailing): conforming", function test(assert){
@@ -244,25 +244,25 @@ QUnit.test( "PARAMS (unused: trailing): violating", function test(assert){
 	assert.expect( 21 );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/params", "ruleId1" );
 	assert.strictEqual( messageId1, "unused", "messageId1" );
-	assert.ok( /`w`/.test(message1), "message1" );
+	assert.ok( message1.includes("`w`"), "message1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/params", "ruleId2" );
 	assert.strictEqual( messageId2, "unused", "messageId2" );
-	assert.ok( /`c`/.test(message2), "message2" );
+	assert.ok( message2.includes("`c`"), "message2" );
 	assert.strictEqual( ruleId3, "@getify/proper-arrows/params", "ruleId3" );
 	assert.strictEqual( messageId3, "unused", "messageId3" );
-	assert.ok( /`d`/.test(message3), "message3" );
+	assert.ok( message3.includes("`d`"), "message3" );
 	assert.strictEqual( ruleId4, "@getify/proper-arrows/params", "ruleId4" );
 	assert.strictEqual( messageId4, "unused", "messageId4" );
-	assert.ok( /`s`/.test(message4), "message4" );
+	assert.ok( message4.includes("`s`"), "message4" );
 	assert.strictEqual( ruleId5, "@getify/proper-arrows/params", "ruleId5" );
 	assert.strictEqual( messageId5, "unused", "messageId5" );
-	assert.ok( /`t`/.test(message5), "message5" );
+	assert.ok( message5.includes("`t`"), "message5" );
 	assert.strictEqual( ruleId6, "@getify/proper-arrows/params", "ruleId6" );
 	assert.strictEqual( messageId6, "unused", "messageId6" );
-	assert.ok( /`u`/.test(message6), "message6" );
+	assert.ok( message6.includes("`u`"), "message6" );
 	assert.strictEqual( ruleId7, "@getify/proper-arrows/params", "ruleId7" );
 	assert.strictEqual( messageId7, "unused", "messageId7" );
-	assert.ok( /`v`/.test(message7), "message7" );
+	assert.ok( message7.includes("`v`"), "message7" );
 } );
 
 QUnit.test( "PARAMS (unused: none): violating", function test(assert){
@@ -299,7 +299,7 @@ QUnit.test( "PARAMS (count: 3, default): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooMany", "messageId" );
-	assert.ok( /`w`/.test(message), "message" );
+	assert.ok( message.includes("`w`"), "message" );
 } );
 
 QUnit.test( "PARAMS (count: 0): conforming", function test(assert){
@@ -325,7 +325,7 @@ QUnit.test( "PARAMS (count: 0): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooMany", "messageId" );
-	assert.ok( /`x`/.test(message), "message" );
+	assert.ok( message.includes("`x`"), "message" );
 } );
 
 QUnit.test( "PARAMS (length: 2, default): conforming", function test(assert){
@@ -351,7 +351,7 @@ QUnit.test( "PARAMS (length: 2, default): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooShort", "messageId" );
-	assert.ok( /`y`/.test(message), "message" );
+	assert.ok( message.includes("`y`"), "message" );
 } );
 
 QUnit.test( "PARAMS (length: 1): conforming", function test(assert){
@@ -442,7 +442,7 @@ QUnit.test( "PARAMS (allowed, unused:all): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "unused", "messageId" );
-	assert.ok( /`w`/.test(message), "message" );
+	assert.ok( message.includes("`w`"), "message" );
 } );
 
 QUnit.test( "PARAMS (allowed, unused:trailing): conforming", function test(assert){
@@ -480,7 +480,7 @@ QUnit.test( "PARAMS (allowed, unused:trailing): violating", function test(assert
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "unused", "messageId" );
-	assert.ok( /`w`/.test(message), "message" );
+	assert.ok( message.includes("`w`"), "message" );
 } );
 
 QUnit.test( "PARAMS (allowed, count:0): conforming", function test(assert){
@@ -518,7 +518,7 @@ QUnit.test( "PARAMS (allowed, count:0): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooMany", "messageId" );
-	assert.ok( /`y`/.test(message), "message" );
+	assert.ok( message.includes("`y`"), "message" );
 } );
 
 QUnit.test( "PARAMS (allowed, count:2): conforming", function test(assert){
@@ -556,7 +556,7 @@ QUnit.test( "PARAMS (allowed, count:2): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooMany", "messageId" );
-	assert.ok( /`w`/.test(message), "message" );
+	assert.ok( message.includes("`w`"), "message" );
 } );
 
 QUnit.test( "PARAMS (allowed, length:2): conforming", function test(assert){
@@ -594,7 +594,7 @@ QUnit.test( "PARAMS (allowed, length:2): violating", function test(assert){
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/params", "ruleId" );
 	assert.strictEqual( messageId, "tooShort", "messageId" );
-	assert.ok( /`w`/.test(message), "message" );
+	assert.ok( message.includes("`w`"), "message" );
 } );
 
 
