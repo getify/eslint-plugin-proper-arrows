@@ -60,6 +60,28 @@ By default, **all rules ignore** these trivial functions. To **force a rule to c
 
 To use **proper-arrows**, load it as a plugin into ESLint and configure the rules as desired.
 
+### `extends`
+
+If you'd like to use the **proper-arrows** plugin in a recommended configuration preset, you can add the plugin in the `extends` clause of your ESLint configuration, and pick a preset by name:
+
+```js
+"extends": [
+    // ..
+    "plugin:@getify/proper-ternary/CONFIG-PRESET-NAME",
+    // ..
+]
+```
+
+**Note:** All included configuration presets not only define specific rule configurations but also automatically load the plugin itself, so you *don't* need to list **proper-arrow** in the `plugins` clause.
+
+The available configuration presets to choose from:
+
+* `getify-says`: This is my personal configuration. See the [preset definition](/lib/index.js#L5-L14).
+
+* ..TBA..
+
+It's important to note that you can still override any of the preset rule definitions in your configuration. Think of these presets as convenience "defaults" that can still be customized.
+
 ### `.eslintrc.json`
 
 To load the plugin and enable its rules via a local or global `.eslintrc.json` configuration file:
