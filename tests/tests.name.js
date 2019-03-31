@@ -42,13 +42,18 @@ QUnit.test( "NAME: arrow with property name", function test(assert){
 
 QUnit.test( "NAME: arrow in default value clause", function test(assert){
 	var code = `
-		function x(x = y => y) {}
+		function f(x = y => y) {}
+		[z = (w,q) => w * q] = arr;
+		[[z] = [(a,b) => a * b]] = arr;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.name );
+	var [{ ruleId, messageId, } = {},] = results || [];
 
-	assert.expect( 1 );
-	assert.strictEqual( results.length, 0, "no errors" );
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/name", "ruleId" );
+	assert.strictEqual( messageId, "noName", "messageId" );
 } );
 
 QUnit.test( "NAME: arrow in default module export", function test(assert){
