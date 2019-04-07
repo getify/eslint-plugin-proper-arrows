@@ -46,10 +46,10 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 			f(z => z);
 			f(g => h);
 			f(k => null);
-			f(k => void 0);
+			f(h => void 0);
 			return { f: v => v };
 		}
-		var f = v => v;
+		var f = r => r;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivialDefault );
