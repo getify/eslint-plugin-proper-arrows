@@ -67,12 +67,12 @@ If you'd like to use the **proper-arrows** plugin in a recommended configuration
 ```js
 "extends": [
     // ..
-    "plugin:@getify/proper-ternary/CONFIG-PRESET-NAME",
+    "plugin:@getify/proper-arrows/CONFIG-PRESET-NAME",
     // ..
 ]
 ```
 
-**Note:** All included configuration presets not only define specific rule configurations but also automatically load the plugin itself, so you *don't* need to list **proper-arrow** in the `plugins` clause.
+**Note:** All included configuration presets not only define specific rule configurations but also automatically load the plugin itself, so you *don't* need to list **proper-arrows** in the `plugins` clause.
 
 The available configuration presets to choose from:
 
