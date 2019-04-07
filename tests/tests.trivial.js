@@ -46,6 +46,7 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 			f(z => z);
 			f(g => h);
 			f(k => null);
+			f(k => void 0);
 			return { f: v => v };
 		}
 		var f = v => v;
@@ -71,9 +72,10 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 			f(z => z);
 			f(g => h);
 			f(k => null);
+			f(h => void 0);
 			return { f: v => v };
 		}
-		var f = v => v;
+		var f = r => r;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivial );
@@ -107,10 +109,14 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 		{ ruleId: ruleId27, messageId: messageId27, message: message27, } = {},
 		{ ruleId: ruleId28, messageId: messageId28, message: message28, } = {},
 		{ ruleId: ruleId29, messageId: messageId29, message: message29, } = {},
+		{ ruleId: ruleId30, messageId: messageId30, message: message30, } = {},
+		{ ruleId: ruleId31, messageId: messageId31, message: message31, } = {},
+		{ ruleId: ruleId32, messageId: messageId32, message: message32, } = {},
+		{ ruleId: ruleId33, messageId: messageId33, message: message33, } = {},
 	] = results || [];
 
-	assert.expect( 54 );
-	assert.strictEqual( results.length, 29, "only 29 errors" );
+	assert.expect( 78 );
+	assert.strictEqual( results.length, 33, "only 33 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/this", "ruleId1" );
 	assert.strictEqual( messageId1, "noThisNested", "messageId1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
@@ -123,20 +129,20 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	assert.strictEqual( messageId5, "noThisNested", "messageId5" );
 	assert.strictEqual( ruleId6, "@getify/proper-arrows/name", "ruleId6" );
 	assert.strictEqual( messageId6, "noName", "messageId6" );
-	assert.strictEqual( ruleId7, "@getify/proper-arrows/name", "ruleId7" );
-	assert.strictEqual( messageId7, "noName", "messageId7" );
-	assert.strictEqual( ruleId8, "@getify/proper-arrows/this", "ruleId8" );
-	assert.strictEqual( messageId8, "noThisNested", "messageId8" );
-	assert.strictEqual( ruleId9, "@getify/proper-arrows/name", "ruleId9" );
-	assert.strictEqual( messageId9, "noName", "messageId9" );
-	assert.strictEqual( ruleId10, "@getify/proper-arrows/params", "ruleId10" );
-	assert.strictEqual( messageId10, "tooShort", "messageId10" );
-	assert.ok( message10.includes("`j`"), "message10" );
-	assert.strictEqual( ruleId11, "@getify/proper-arrows/params", "ruleId11" );
-	assert.strictEqual( messageId11, "unused", "messageId11" );
-	assert.ok( message11.includes("`j`"), "message11" );
-	assert.strictEqual( ruleId12, "@getify/proper-arrows/this", "ruleId12" );
-	assert.strictEqual( messageId12, "noThisNested", "messageId12" );
+	assert.strictEqual( ruleId7, "@getify/proper-arrows/this", "ruleId7" );
+	assert.strictEqual( messageId7, "noThisNested", "messageId7" );
+	assert.strictEqual( ruleId8, "@getify/proper-arrows/name", "ruleId8" );
+	assert.strictEqual( messageId8, "noName", "messageId8" );
+	assert.strictEqual( ruleId9, "@getify/proper-arrows/params", "ruleId9" );
+	assert.strictEqual( messageId9, "tooShort", "messageId9" );
+	assert.ok( message9.includes("`j`"), "message9" );
+	assert.strictEqual( ruleId10, "@getify/proper-arrows/name", "ruleId10" );
+	assert.strictEqual( messageId10, "noName", "messageId10" );
+	assert.strictEqual( ruleId11, "@getify/proper-arrows/this", "ruleId11" );
+	assert.strictEqual( messageId11, "noThisNested", "messageId11" );
+	assert.strictEqual( ruleId12, "@getify/proper-arrows/params", "ruleId12" );
+	assert.strictEqual( messageId12, "unused", "messageId12" );
+	assert.ok( message12.includes("`j`"), "message12" );
 	assert.strictEqual( ruleId13, "@getify/proper-arrows/name", "ruleId13" );
 	assert.strictEqual( messageId13, "noName", "messageId13" );
 	assert.strictEqual( ruleId14, "@getify/proper-arrows/params", "ruleId14" );
@@ -147,23 +153,47 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	assert.strictEqual( ruleId16, "@getify/proper-arrows/name", "ruleId16" );
 	assert.strictEqual( messageId16, "noName", "messageId16" );
 	assert.strictEqual( ruleId17, "@getify/proper-arrows/params", "ruleId17" );
-	assert.strictEqual( messageId17, "unused", "messageId17" );
+	assert.strictEqual( messageId17, "tooShort", "messageId17" );
 	assert.ok( message17.includes("`g`"), "message17" );
-	assert.strictEqual( ruleId18, "@getify/proper-arrows/this", "ruleId18" );
-	assert.strictEqual( messageId18, "noThisNested", "messageId18" );
-	assert.strictEqual( ruleId19, "@getify/proper-arrows/params", "ruleId19" );
-	assert.strictEqual( messageId19, "tooShort", "messageId19" );
-	assert.ok( message19.includes("`g`"), "message19" );
+	assert.strictEqual( ruleId18, "@getify/proper-arrows/params", "ruleId18" );
+	assert.strictEqual( messageId18, "unused", "messageId18" );
+	assert.ok( message18.includes("`g`"), "message18" );
+	assert.strictEqual( ruleId19, "@getify/proper-arrows/this", "ruleId19" );
+	assert.strictEqual( messageId19, "noThisNested", "messageId19" );
 	assert.strictEqual( ruleId20, "@getify/proper-arrows/name", "ruleId20" );
 	assert.strictEqual( messageId20, "noName", "messageId20" );
 	assert.strictEqual( ruleId21, "@getify/proper-arrows/params", "ruleId21" );
-	assert.strictEqual( messageId21, "tooShort", "messageId21" );
+	assert.strictEqual( messageId21, "unused", "messageId21" );
 	assert.ok( message21.includes("`k`"), "message21" );
-	assert.strictEqual( ruleId22, "@getify/proper-arrows/params", "ruleId22" );
-	assert.strictEqual( messageId22, "unused", "messageId22" );
-	assert.ok( message22.includes("`k`"), "message22" );
-	assert.strictEqual( ruleId23, "@getify/proper-arrows/this", "ruleId23" );
-	assert.strictEqual( messageId23, "noThisNested", "messageId23" );
+	assert.strictEqual( ruleId22, "@getify/proper-arrows/this", "ruleId22" );
+	assert.strictEqual( messageId22, "noThisNested", "messageId22" );
+	assert.strictEqual( ruleId23, "@getify/proper-arrows/params", "ruleId23" );
+	assert.strictEqual( messageId23, "tooShort", "messageId23" );
+	assert.ok( message23.includes("`k`"), "message23" );
+	assert.strictEqual( ruleId24, "@getify/proper-arrows/name", "ruleId24" );
+	assert.strictEqual( messageId24, "noName", "messageId24" );
+	assert.strictEqual( ruleId25, "@getify/proper-arrows/params", "ruleId25" );
+	assert.strictEqual( messageId25, "tooShort", "messageId25" );
+	assert.ok( message25.includes("`h`"), "message25" );
+	assert.strictEqual( ruleId26, "@getify/proper-arrows/params", "ruleId26" );
+	assert.strictEqual( messageId26, "unused", "messageId26" );
+	assert.ok( message26.includes("`h`"), "message26" );
+	assert.strictEqual( ruleId27, "@getify/proper-arrows/this", "ruleId27" );
+	assert.strictEqual( messageId27, "noThisNested", "messageId27" );
+	assert.strictEqual( ruleId28, "@getify/proper-arrows/where", "ruleId28" );
+	assert.strictEqual( messageId28, "noProperty", "messageId28" );
+	assert.strictEqual( ruleId29, "@getify/proper-arrows/params", "ruleId29" );
+	assert.strictEqual( messageId29, "tooShort", "messageId29" );
+	assert.ok( message29.includes("`v`"), "message29" );
+	assert.strictEqual( ruleId30, "@getify/proper-arrows/this", "ruleId30" );
+	assert.strictEqual( messageId30, "noThisNested", "messageId30" );
+	assert.strictEqual( ruleId31, "@getify/proper-arrows/where", "ruleId31" );
+	assert.strictEqual( messageId31, "noGlobal", "messageId31" );
+	assert.strictEqual( ruleId32, "@getify/proper-arrows/params", "ruleId32" );
+	assert.strictEqual( messageId32, "tooShort", "messageId32" );
+	assert.ok( message32.includes("`r`"), "message32" );
+	assert.strictEqual( ruleId33, "@getify/proper-arrows/this", "ruleId33" );
+	assert.strictEqual( messageId33, "noThisNested", "messageId33" );
 } );
 
 QUnit.test( "TRIVIAL (module-export, default): violating", function test(assert){

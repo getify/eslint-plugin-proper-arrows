@@ -44,7 +44,7 @@ It's common for `=>` arrow functions to be used as a shorthand for simple/trivia
 v => v;
 ```
 
-**Note:** To be specific on the definition of "trivial" being used here: trivial functions have no more than 1 parameter (simple identifier only), and either have no return (`{}`) or a concise return of a single variable or primitive (non-object) literal.
+**Note:** To be specific on the definition of "trivial" being used here: trivial functions have no more than 1 parameter (simple identifier only), and either have no return (`{}`) or a concise return of: a single variable, primitive (non-object) literal, or a `void __` expression.
 
 These types of functions are so simple that they don't suffer much from readability issues despite their concise syntax. As such, it's likely preferred to allow them even if one of the rules here would normally report them.
 
