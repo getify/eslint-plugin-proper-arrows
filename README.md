@@ -18,7 +18,7 @@ The rules defined in this plugin:
 
    **Note:** This rule is like the "as-needed" mode of the [built-in ESLint "func-names" rule](https://eslint.org/docs/rules/func-names), but applied to `=>` arrow functions; the built-in rule ignores them.
 
-* [`"where"`](#rule-where): restricts where in program structure `=>` arrow functions can be used: forbidding them in the top-level/global scope, object properties, `export` statements, etc.
+* [`"where"`](#rule-where): restricts where in program structure `=>` arrow functions can be used: forbidding them in the global/top-level-module scope, object properties, `export` statements, etc.
 
 * [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding concise returns of conditional/ternary expressions (`x => x ? y : z`), etc.
 
@@ -465,7 +465,7 @@ In this snippet, all three `=>` arrow functions remain anonymous because no name
 
 The **proper-arrows**/*where* rule restricts where in program structure `=>` arrow functions can be used.
 
-This rule can be configured to forbid `=>` arrow functions in the top-level/global scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
+This rule can be configured to forbid `=>` arrow functions in the global/top-level-module scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
 
 To turn this rule on:
 
@@ -479,7 +479,7 @@ To turn this rule on:
 
 The main purpose of this rule is to avoid readability harm when using `=>` arrow functions in certain program structure locations.
 
-Placing `=>` arrow functions in the top-level/global scope has no benefit other than preferred style; they're more proper as regular function declarations. Placing `=>` arrow functions on object properties has no benefit other than preferred style; they're more proper as concise object methods. Placing arrow functions in `export` statements offers no benefit other than being more concise; they're more proper as exported named function declarations.
+Placing `=>` arrow functions in the global/top-level-module scope has no benefit other than preferred style; they're more proper as regular function declarations. Placing `=>` arrow functions on object properties has no benefit other than preferred style; they're more proper as concise object methods. Placing arrow functions in `export` statements offers no benefit other than being more concise; they're more proper as exported named function declarations.
 
 For example:
 
@@ -527,7 +527,7 @@ The **proper-arrows**/*where* rule can be configured with three (non-exclusive) 
 
 **Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
 
-* [`"global"`](#rule-where-configuration-global) (default: `true`) forbids `=>` arrow functions in the top-level/global scope.
+* [`"global"`](#rule-where-configuration-global) (default: `true`) forbids `=>` arrow functions in the global/top-level-module scope.
 
 * [`"property"`](#rule-where-configuration-property) (default: `true`) forbids assigning `=>` arrow functions to object properties.
 
@@ -541,7 +541,7 @@ To configure this rule mode (on by default, set as `false` to turn off):
 "@getify/proper-arrows/where": [ "error", { "global": true, "trivial": false } ]
 ```
 
-When defining functions at the top-level/global scope, use a regular function declaration:
+When defining functions at the global/top-level-module scope, use a regular function declaration:
 
 ```js
 function onData(data) {
@@ -870,11 +870,11 @@ The **proper-arrows**/*this* rule can be configured in one of three modes: `"nes
 
 * [`"nested"`](#rule-this-configuration-nested) (default) permits a `this` to appear lower in a nested `=>` arrow function (i.e., `x = y => z => this.foo(z)`), as long as there is no non-arrow function boundary crossed.
 
-   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
+   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the global scope (where they might inherit the global object as `this`) or from the top-level of a module (where `this` would be `undefined`).
 
 * [`"always"`](#rule-this-configuration-always) is more strict, requiring every single `=>` arrow function to have its own `this` reference.
 
-   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the top-level scope (where they might inherit the global object as `this`).
+   Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the global scope (where they might inherit the global object as `this`) or from the top-level of a module (where `this` would be `undefined`).
 
 * [`"never"`](#rule-this-configuration-never) is the reverse of the rule: all `=>` arrow functions are forbidden from using `this`.
 
