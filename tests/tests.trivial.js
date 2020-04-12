@@ -215,10 +215,15 @@ QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(as
 	var results = eslinter.verify( code, linterOptions.trivialModule );
 
 	assert.expect( 1 );
-	var [{ ruleId, messageId, } = {},] = results || [];
+	var [
+		{ ruleId: ruleId1, messageId: messageId1, } = {},
+		{ ruleId: ruleId2, messageId: messageId2, } = {},
+	] = results || [];
 
-	assert.expect( 3 );
-	assert.strictEqual( results.length, 1, "only 1 error" );
-	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
-	assert.strictEqual( messageId, "noExport", "messageId" );
+	assert.expect( 5 );
+	assert.strictEqual( results.length, 2, "only 2 error" );
+	assert.strictEqual( ruleId1, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId1, "noGlobal", "messageId" );
+	assert.strictEqual( ruleId2, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId2, "noExport", "messageId" );
 } );
