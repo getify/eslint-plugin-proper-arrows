@@ -214,7 +214,6 @@ QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(as
 
 	var results = eslinter.verify( code, linterOptions.trivialModule );
 
-	assert.expect( 1 );
 	var [
 		{ ruleId: ruleId1, messageId: messageId1, } = {},
 		{ ruleId: ruleId2, messageId: messageId2, } = {},
