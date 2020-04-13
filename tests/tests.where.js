@@ -13,6 +13,14 @@ var linterOptions = {
 		parserOptions: { ecmaVersion: 2015, },
 		rules: { "@getify/proper-arrows/where": ["error",{global:true,property:false,export:false,trivial:true,},], },
 	},
+	whereModuleGlobalDefault: {
+		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
+		rules: { "@getify/proper-arrows/where": ["error",{property:false,export:false,trivial:true,},], },
+	},
+	whereModuleGlobal: {
+		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
+		rules: { "@getify/proper-arrows/where": ["error",{global:true,property:false,export:false,trivial:true,},], },
+	},
 	wherePropertyDefault: {
 		parserOptions: { ecmaVersion: 2015, },
 		rules: { "@getify/proper-arrows/where": ["error",{global:false,export:false,trivial:true,},], },
@@ -114,6 +122,60 @@ QUnit.test( "WHERE (global): violating", function test(assert){
 	`;
 
 	var results = eslinter.verify( code, linterOptions.whereGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId, "noGlobal", "messageId" );
+} );
+
+QUnit.test( "WHERE (module-global, default): conforming", function test(assert){
+	var code = `
+		function foo() {
+			var f = x => y;
+		}
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereModuleGlobalDefault );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "WHERE (module-global, default): violating", function test(assert){
+	var code = `
+		var f = x => y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereModuleGlobalDefault );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId, "noGlobal", "messageId" );
+} );
+
+QUnit.test( "WHERE (module-global): conforming", function test(assert){
+	var code = `
+		function foo() {
+			var f = x => y;
+		}
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereModuleGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "WHERE (module-global): violating", function test(assert){
+	var code = `
+		var f = x => y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereModuleGlobal );
 	var [{ ruleId, messageId, } = {},] = results || [];
 
 	assert.expect( 3 );
