@@ -29,6 +29,14 @@ var linterOptions = {
 		parserOptions: { ecmaVersion: 2015, },
 		rules: { "@getify/proper-arrows/this": ["error","never",], },
 	},
+	thisAllowNoGlobal: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/this": ["error","allow",{"no-global": true,trivial:true,},], },
+	},
+	thisAllow: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/this": ["error","allow",{trivial:true,},], },
+	},
 };
 
 QUnit.test( "THIS (always): one arrow, this", function test(assert){
@@ -196,9 +204,295 @@ QUnit.test( "THIS (always): one non-arrow and one arrow, nested this", function 
 	assert.strictEqual( results.length, 0, "no errors" );
 } );
 
+// **********************************************
+
+QUnit.test( "THIS (allow + no-global): inner arrow, this", function test(assert){
+	var code = `
+		function x() { return y => this.foo(y); }
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllowNoGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow + no-global): parameter arrow, this", function test(assert){
+	var code = `
+		function x(z = y => this.foo(y)) { }
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllowNoGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow + no-global): outer arrow, this", function test(assert){
+	var code = `
+		var x = y => this.foo(y);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllowNoGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "noGlobal", "messageId" );
+} );
+
+QUnit.test( "THIS (allow + no-global): property arrow, this", function test(assert){
+	var code = `
+		var o = { x: y => this.foo(y) };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllowNoGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "noGlobal", "messageId" );
+} );
 
 // **********************************************
 
+QUnit.test( "THIS (alliw): one arrow, this", function test(assert){
+	var code = `
+		var x = y => this.foo(y);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two nested arrows, both this", function test(assert){
+	var code = `
+		var x = y => this.foo(z => this.bar(z));
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow with param arrow, both this", function test(assert){
+	var code = `
+		var x = (y = z => this.foo(z)) => this.bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two separate arrows, both this", function test(assert){
+	var code = `
+		var x = y => this.foo(y);
+		var z = w => this.bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): simple arrow, no this", function test(assert){
+	var code = `
+		var x = y => y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two separate arrows, no this", function test(assert){
+	var code = `
+		var x = y => foo(y);
+		var z = w => bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two nested arrows, one this nested", function test(assert){
+	var code = `
+		var x = y => z => this.foo(z);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two nested arrows, one this not-nested", function test(assert){
+	var code = `
+		var x = y => this.foo(z => z);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two nested arrows, no this", function test(assert){
+	var code = `
+		var x = y => z => z;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow with param arrow, nested this", function test(assert){
+	var code = `
+		var x = (y = z => foo(z)) => this.bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow with param arrow, param this", function test(assert){
+	var code = `
+		var x = (y = z => this.foo(z)) => bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with non-arrow between, both this", function test(assert){
+	var code = `
+		var x = y => this.foo(function(){ return z => this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with non-arrow between, nested this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return z => this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with method between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ method(){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with getter between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ get baz(){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with setter between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ set baz(v){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow and non-arrow with arrow param, param this", function test(assert){
+	var code = `
+		var x = y => foo(function(z = w => this.bar(w)){ return bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with non-arrow between, not-nested this", function test(assert){
+	var code = `
+		var x = y => this.foo(function(){ return z => bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): two arrows with non-arrow between, no this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return z => bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow and one non-arrow, both this", function test(assert){
+	var code = `
+		var x = y => this.foo(function(){ return this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (allow): one arrow and one non-arrow, nested this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisAllow );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+
+// **********************************************
 
 QUnit.test( "THIS (always + no-global): inner arrow, this", function test(assert){
 	var code = `
