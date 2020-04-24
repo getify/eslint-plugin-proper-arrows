@@ -201,6 +201,19 @@ QUnit.test( "THIS (always): one non-arrow and one arrow, nested this", function 
 } );
 
 // **********************************************
+QUnit.test( "THIS (never-global): two nested arrows, one this nested", function test(assert){
+	var code = `
+		var x = y => z => this.foo(z);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
+} );
 
 QUnit.test( "THIS (never-global): arrow function as argument, this", function test(assert){
 	var code = `
