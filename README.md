@@ -814,7 +814,7 @@ In this snippet, the `=>` arrow function has a comma sequence as the concise ret
 
 ## Rule: `"this"`
 
-The **proper-arrows**/*this* rule requires `=>` arrow functions to reference the `this` keyword. It also supports a `"never"` configuration mode, which reverses the rule and means that `=>` arrow functions must never use `this` and `"never-global"` which restricts usage of global `this` in arrow functions.
+The **proper-arrows**/*this* rule requires `=>` arrow functions to reference the `this` keyword. It also supports a `"never"` configuration mode, which reverses the rule and means that `=>` arrow functions must never use `this`, as well as a `"never-global"` configuration mode which only disallows `this` usage in arrow functions that are in the global scope.
 
 To turn this rule on:
 
@@ -866,7 +866,7 @@ To pass the **proper-arrows**/*this* rule without a reported error, all `=>` arr
 
 ### Rule Configuration
 
-The **proper-arrows**/*this* rule can be configured in one of three modes: `"nested"` (default), `"always"`, `"never"` and `"never-global"`.
+The **proper-arrows**/*this* rule can be configured in one of four modes: `"nested"` (default), `"always"`, `"never"` and `"never-global"`.
 
 * [`"nested"`](#rule-this-configuration-nested) (default) permits a `this` to appear lower in a nested `=>` arrow function (i.e., `x = y => z => this.foo(z)`), as long as there is no non-arrow function boundary crossed.
 
@@ -878,7 +878,7 @@ The **proper-arrows**/*this* rule can be configured in one of three modes: `"nes
 
 * [`"never"`](#rule-this-configuration-never) is the reverse of the rule: all `=>` arrow functions are forbidden from using `this`.
 
-* [`"never-global"`](#rule-this-configuration-never-global) all `=>` arrow functions are forbidden from using **global** `this`.
+* [`"never-global"`](#rule-this-configuration-never-global) disallows `this` usage in arrow functions that are in the global scope.
 
 #### Rule `"this"` Configuration: `"nested"`
 
@@ -1051,7 +1051,7 @@ To configure this rule mode:
 "@getify/proper-arrows/this": [ "error", "never-global" ]
 ```
 
-This rule mode **forbids** a **global** `this` reference from appearing in any `=>` arrow function.
+This rule mode **forbids** `this` usage in arrow functions that are in the global scope.
 
 These statements will all pass the rule in this mode:
 

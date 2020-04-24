@@ -213,7 +213,7 @@ QUnit.test( "THIS (never-global): arrow function as argument, this", function te
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
-	assert.strictEqual( messageId, "noGlobal", "messageId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
 } );
 
 QUnit.test( "THIS (never-global): inner arrow, this", function test(assert){
@@ -249,7 +249,7 @@ QUnit.test( "THIS (never-global): outer arrow, this", function test(assert){
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
-	assert.strictEqual( messageId, "noGlobal", "messageId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
 } );
 
 QUnit.test( "THIS (never-global): property arrow, this", function test(assert){
@@ -263,7 +263,7 @@ QUnit.test( "THIS (never-global): property arrow, this", function test(assert){
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
-	assert.strictEqual( messageId, "noGlobal", "messageId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
 } );
 
 QUnit.test( "THIS (never-global): simple arrow, no this", function test(assert){
