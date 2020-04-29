@@ -22,9 +22,7 @@ The rules defined in this plugin:
 
 * [`"return"`](#rule-return): restricts the concise return value kind for `=>` arrow functions, such as forbidding object literal concise returns (`x => ({ x })`), forbidding concise returns of conditional/ternary expressions (`x => x ? y : z`), etc.
 
-* [`"this"`](#rule-this): requires/disallows `=>` arrow functions using a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function.
-
-   This rule can optionally forbid `this`-containing `=>` arrow functions from the global scope.
+* [`"this"`](#rule-this): requires/disallows `=>` arrow functions using a `this` reference, in the `=>` arrow function itself or in a nested `=>` arrow function; optionally, this rule can forbid `this`-containing `=>` arrow functions only from the global scope.
 
 ### Trivial `=>` Arrow Functions
 
@@ -1051,7 +1049,7 @@ To configure this rule mode:
 "@getify/proper-arrows/this": [ "error", "never-global" ]
 ```
 
-This rule mode **forbids** `this` usage in arrow functions that are in the global scope.
+This rule mode **forbids** `this` usage in arrow functions that are in the global scope (including nested arrow functions).
 
 These statements will all pass the rule in this mode:
 
@@ -1071,7 +1069,7 @@ var a = b => this.foo(b);
 var c = d => e => this.foo(e);
 
 var f = g => foo(h => this.bar(h));
-
+```
 
 ## npm Package
 
