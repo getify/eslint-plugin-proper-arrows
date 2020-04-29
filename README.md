@@ -814,7 +814,7 @@ In this snippet, the `=>` arrow function has a comma sequence as the concise ret
 
 ## Rule: `"this"`
 
-The **proper-arrows**/*this* rule requires `=>` arrow functions to reference the `this` keyword. It also supports a `"never"` configuration mode, which reverses the rule and means that `=>` arrow functions must never use `this`.
+The **proper-arrows**/*this* rule requires `=>` arrow functions to reference the `this` keyword. It also supports a `"never"` configuration mode, which reverses the rule and means that `=>` arrow functions must never use `this`, as well as a `"never-global"` configuration mode which only disallows `this` usage in arrow functions that are in the global scope.
 
 To turn this rule on:
 
@@ -866,7 +866,7 @@ To pass the **proper-arrows**/*this* rule without a reported error, all `=>` arr
 
 ### Rule Configuration
 
-The **proper-arrows**/*this* rule can be configured in one of three modes: `"nested"` (default), `"always"`, and `"never"`.
+The **proper-arrows**/*this* rule can be configured in one of four modes: `"nested"` (default), `"always"`, `"never"` and `"never-global"`.
 
 * [`"nested"`](#rule-this-configuration-nested) (default) permits a `this` to appear lower in a nested `=>` arrow function (i.e., `x = y => z => this.foo(z)`), as long as there is no non-arrow function boundary crossed.
 
@@ -877,6 +877,8 @@ The **proper-arrows**/*this* rule can be configured in one of three modes: `"nes
    Additionally, include the `"no-global"` option (default: `false`) to forbid `this`-containing `=>` arrow functions from the global scope (where they might inherit the global object as `this`) or from the top-level of a module (where `this` would be `undefined`).
 
 * [`"never"`](#rule-this-configuration-never) is the reverse of the rule: all `=>` arrow functions are forbidden from using `this`.
+
+* [`"never-global"`](#rule-this-configuration-never-global) disallows `this` usage in arrow functions that are in the global scope.
 
 #### Rule `"this"` Configuration: `"nested"`
 
@@ -1039,6 +1041,37 @@ var f = g => foo(h => this.bar(h));
 ```
 
 **Note:** The `"no-global"` option and [`"trivial"` option](#trivial--arrow-functions) are not applicable and have no effect for this rule mode.
+
+
+### Rule `"this"` Configuration: `"never-global"`
+
+To configure this rule mode:
+
+```json
+"@getify/proper-arrows/this": [ "error", "never-global" ]
+```
+
+This rule mode **forbids** `this` usage in arrow functions that are in the global scope.
+
+These statements will all pass the rule in this mode:
+
+```js
+var a = b => foo(b);
+
+var c = d => foo({ set baz(v){ return z => this.bar(z); } })
+
+var e = f => foo({ method(){ return z => this.bar(z); } })
+```
+
+But these statements will each fail the rule in this mode:
+
+```js
+var a = b => this.foo(b);
+
+var c = d => e => this.foo(e);
+
+var f = g => foo(h => this.bar(h));
+
 
 ## npm Package
 

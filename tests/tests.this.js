@@ -29,6 +29,10 @@ var linterOptions = {
 		parserOptions: { ecmaVersion: 2015, },
 		rules: { "@getify/proper-arrows/this": ["error","never",], },
 	},
+	thisNeverGlobal: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: { "@getify/proper-arrows/this": ["error","never-global",{trivial:true,},], },
+	},
 };
 
 QUnit.test( "THIS (always): one arrow, this", function test(assert){
@@ -196,9 +200,197 @@ QUnit.test( "THIS (always): one non-arrow and one arrow, nested this", function 
 	assert.strictEqual( results.length, 0, "no errors" );
 } );
 
+// **********************************************
+QUnit.test( "THIS (never-global): two nested arrows, one this nested", function test(assert){
+	var code = `
+		var x = y => z => this.foo(z);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
+} );
+
+QUnit.test( "THIS (never-global): arrow function as argument, this", function test(assert){
+	var code = `
+		var f = foo(() => this.bar())
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
+} );
+
+QUnit.test( "THIS (never-global): inner arrow, this", function test(assert){
+	var code = `
+		function x() { return y => this.foo(y); }
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): parameter arrow, this", function test(assert){
+	var code = `
+		function x(z = y => this.foo(y)) { }
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): outer arrow, this", function test(assert){
+	var code = `
+		var x = y => this.foo(y);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
+} );
+
+QUnit.test( "THIS (never-global): property arrow, this", function test(assert){
+	var code = `
+		var o = { x: y => this.foo(y) };
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
+	assert.strictEqual( messageId, "neverGlobal", "messageId" );
+} );
+
+QUnit.test( "THIS (never-global): simple arrow, no this", function test(assert){
+	var code = `
+		var x = y => y;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two separate arrows, no this", function test(assert){
+	var code = `
+		var x = y => foo(y);
+		var z = w => bar(w);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two nested arrows, no this", function test(assert){
+	var code = `
+		var x = y => z => z;
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two arrows with non-arrow between, nested this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return z => this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two arrows with method between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ method(){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two arrows with getter between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ get baz(){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two arrows with setter between, nested this", function test(assert){
+	var code = `
+		var x = y => foo({ set baz(v){ return z => this.bar(z); } });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): one arrow and non-arrow with arrow param, param this", function test(assert){
+	var code = `
+		var x = y => foo(function(z = w => this.bar(w)){ return bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): two arrows with non-arrow between, no this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return z => bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
+
+QUnit.test( "THIS (never-global): one arrow and one non-arrow, nested this", function test(assert){
+	var code = `
+		var x = y => foo(function(){ return this.bar(z); });
+	`;
+
+	var results = eslinter.verify( code, linterOptions.thisNeverGlobal );
+
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 0, "no errors" );
+} );
 
 // **********************************************
-
 
 QUnit.test( "THIS (always + no-global): inner arrow, this", function test(assert){
 	var code = `
