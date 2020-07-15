@@ -495,11 +495,15 @@ function onData(data) {
 }
 
 export default function lookup(id) {
-    People.getData(id,onData);
+    return People.getData(id,onData);
 }
+
+export var lookup = function(id) {
+    return People.getData(id,onData);
+};
 ```
 
-In this snippet, the `getData(..)` function is a clear and proper concise method on `People` object, `onData(..)` is a regular function declaration, and `lookup(..)` is a named export declaration. Therefore, the **proper-arrows**/*where* rule would not report any errors.
+In this snippet, the `getData(..)` function is a clear and proper concise method on `People` object, `onData(..)` is a regular function declaration, and `lookup(..)` is either a default or named-declaration export declaration. Therefore, the **proper-arrows**/*where* rule would not report any errors.
 
 By contrast, this rule *would* default to reporting errors for each of these `=>` arrow functions:
 
@@ -515,6 +519,8 @@ var onData = data => {
 };
 
 export default id => People.getData(id,onData)
+
+export var lookup = id => People.getData(id,onData)
 ```
 
 These usages of `=>` arrow functions are not helping the readability or behavior of this snippet.
@@ -593,11 +599,15 @@ To configure this rule mode (on by default, set as `false` to turn off):
 "@getify/proper-arrows/where": [ "error", { "export": true, "trivial": false } ]
 ```
 
-When exporting a function declaration, use a named function:
+When exporting function declarations/expressions, use non-arrow functions:
 
 ```js
 export default function lookup(id) {
-    People.getData(id,onData);
+    return People.getData(id,onData);
+}
+
+export var lookup = function(id) {
+    return People.getData(id,onData);
 }
 ```
 
@@ -605,9 +615,11 @@ By contrast, this rule mode *would* report errors for:
 
 ```js
 export default id => People.getData(id,onData)
+
+export var lookup = id => People.getData(id,onData)
 ```
 
-In this snippet, the `=>` arrow function is less obviously a function than named function form.
+In this snippet, the `=>` arrow functions are less obviously a function than named function form.
 
 ## Rule: `"return"`
 

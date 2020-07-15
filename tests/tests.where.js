@@ -212,7 +212,7 @@ QUnit.test( "WHERE (property): violating", function test(assert){
 	assert.strictEqual( messageId, "noProperty", "messageId" );
 } );
 
-QUnit.test( "WHERE (export, default): violating", function test(assert){
+QUnit.test( "WHERE (default-export, default): violating", function test(assert){
 	var code = `
 		export default () => {};
 	`;
@@ -226,9 +226,37 @@ QUnit.test( "WHERE (export, default): violating", function test(assert){
 	assert.strictEqual( messageId, "noExport", "messageId" );
 } );
 
-QUnit.test( "WHERE (export): violating", function test(assert){
+QUnit.test( "WHERE (default-export): violating", function test(assert){
 	var code = `
 		export default () => {};
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereExport );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId, "noExport", "messageId" );
+} );
+
+QUnit.test( "WHERE (named-declaration-export, default): violating", function test(assert){
+	var code = `
+		export var x = () => {};
+	`;
+
+	var results = eslinter.verify( code, linterOptions.whereExportDefault );
+	var [{ ruleId, messageId, } = {},] = results || [];
+
+	assert.expect( 3 );
+	assert.strictEqual( results.length, 1, "only 1 error" );
+	assert.strictEqual( ruleId, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId, "noExport", "messageId" );
+} );
+
+QUnit.test( "WHERE (named-declaration-export): violating", function test(assert){
+	var code = `
+		export var x = () => {};
 	`;
 
 	var results = eslinter.verify( code, linterOptions.whereExport );
