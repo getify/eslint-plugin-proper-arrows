@@ -222,7 +222,7 @@ For example:
 var fn = (data,user) => ajax(user.id,data);
 ```
 
-In this snippet, the `=>` arrow function has two parameters, and both are 4 characters long and used in the function body. Therefore, the **proper-arrows**/*this* rule would not report any errors.
+In this snippet, the `=>` arrow function has two parameters, and both are 4 characters long and used in the function body. Therefore, the **proper-arrows**/*params* rule would not report any errors.
 
 By contrast, this rule *would* report errors for:
 
@@ -804,7 +804,7 @@ To configure this rule mode (on by default, set as `false` to turn off):
 "@getify/proper-arrows/return": [ "error", { "sequence": true, "trivial": false } ]
 ```
 
-Comma sequences are not very common, but one place they're a bit more common is as the concise return expression from an `=>` arrow function so that multiple expression-statments can be strung together without needing a full function body. This may be clever or concise, but it's almost always less readable than just using separate statements.
+Comma sequences are not very common, but one place they're a bit more common is as the concise return expression from an `=>` arrow function so that multiple expression-statements can be strung together without needing a full function body. This may be clever or concise, but it's almost always less readable than just using separate statements.
 
 For example:
 
@@ -836,7 +836,7 @@ To turn this rule on:
 "@getify/proper-arrows/this": [ "error", "always", { "no-global": true, "trivial": false } ]
 ```
 
-The main purpose of this rule is to avoid usage of `=>` arrow functions as just function shorthand (i.e., `arr.map(x => x * 2)`), which can be argued is a misusage. Concise `=>` arrow function syntax (with all its myriad variations) can harm readability, so instead `=>` arrow functions should only be used when the "lexical this" behavior is needed.
+The main purpose of this rule is to avoid usage of `=>` arrow functions as just function shorthand (i.e., `arr.map(x => x * 2)`), which can be argued as a misusage. Concise `=>` arrow function syntax (with all its myriad variations) can harm readability, so instead `=>` arrow functions should only be used when the "lexical this" behavior is needed.
 
 Since `=>` arrow functions don't have their own `this`, they treat any `this` reference as a normal variable (not a special keyword). That means `this` is lexically looked up through any parent scopes until a valid definition of `this` is found -- from a normal non-arrow function, or finally in the global scope itself.
 
