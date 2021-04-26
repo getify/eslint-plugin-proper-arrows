@@ -1,6 +1,6 @@
 {
 	"name": "@getify/eslint-plugin-proper-arrows",
-	"version": "10.0.0",
+	"version": "11.0.0",
 	"description": "ESLint rules to ensure proper arrow function definitions",
 	"main": "./lib/index.js",
 	"scripts": {
@@ -16,7 +16,6 @@
 		"prepublish": "npm run build && npm run test:all",
 		"publish": "npm run coverage:report"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"coveralls": "^3.1.0",
 		"eslint": "^7.4.0",
@@ -24,7 +23,7 @@
 		"terser": "^4.6.12"
 	},
 	"peerDependencies": {
-		"eslint": ">= 7.0"
+		"eslint": ">= 7.25"
 	},
 	"repository": "getify/eslint-plugin-proper-arrows",
 	"keywords": [

@@ -49,7 +49,8 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 			f(h => void 0);
 			return { f: v => v };
 		}
-		var f = r => r;
+		f = r => r;
+		var g = s => s;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivialDefault );
@@ -75,7 +76,8 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 			f(h => void 0);
 			return { f: v => v };
 		}
-		var f = r => r;
+		f = r => r;
+		var g = s => s;
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivial );
@@ -113,10 +115,13 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 		{ ruleId: ruleId31, messageId: messageId31, message: message31, } = {},
 		{ ruleId: ruleId32, messageId: messageId32, message: message32, } = {},
 		{ ruleId: ruleId33, messageId: messageId33, message: message33, } = {},
+		{ ruleId: ruleId34, messageId: messageId34, message: message34, } = {},
+		{ ruleId: ruleId35, messageId: messageId35, message: message35, } = {},
+		{ ruleId: ruleId36, messageId: messageId36, message: message36, } = {},
 	] = results || [];
 
-	assert.expect( 78 );
-	assert.strictEqual( results.length, 33, "only 33 errors" );
+	assert.expect( 85 );
+	assert.strictEqual( results.length, 36, "only 36 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/this", "ruleId1" );
 	assert.strictEqual( messageId1, "noThisNested", "messageId1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/return", "ruleId2" );
@@ -194,11 +199,20 @@ QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){
 	assert.ok( message32.includes("`r`"), "message32" );
 	assert.strictEqual( ruleId33, "@getify/proper-arrows/this", "ruleId33" );
 	assert.strictEqual( messageId33, "noThisNested", "messageId33" );
+	assert.strictEqual( ruleId34, "@getify/proper-arrows/where", "ruleId34" );
+	assert.strictEqual( messageId34, "noGlobalDeclaration", "messageId34" );
+	assert.strictEqual( ruleId35, "@getify/proper-arrows/params", "ruleId35" );
+	assert.strictEqual( messageId35, "tooShort", "messageId35" );
+	assert.ok( message35.includes("`s`"), "message35" );
+	assert.strictEqual( ruleId36, "@getify/proper-arrows/this", "ruleId36" );
+	assert.strictEqual( messageId36, "noThisNested", "messageId36" );
 } );
 
-QUnit.test( "TRIVIAL (module-export, default): violating", function test(assert){
+QUnit.test( "TRIVIAL (module-export, default): conforming", function test(assert){
 	var code = `
 		export default () => {};
+		f = () => {};
+		var g = () => {};
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivialModuleDefault );
@@ -210,6 +224,8 @@ QUnit.test( "TRIVIAL (module-export, default): violating", function test(assert)
 QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(assert){
 	var code = `
 		export default () => {};
+		f = () => {};
+		var g = () => {};
 	`;
 
 	var results = eslinter.verify( code, linterOptions.trivialModule );
@@ -217,12 +233,18 @@ QUnit.test( "TRIVIAL (module-export, trivial:true): violating", function test(as
 	var [
 		{ ruleId: ruleId1, messageId: messageId1, } = {},
 		{ ruleId: ruleId2, messageId: messageId2, } = {},
+		{ ruleId: ruleId3, messageId: messageId3, } = {},
+		{ ruleId: ruleId4, messageId: messageId4, } = {},
 	] = results || [];
 
-	assert.expect( 5 );
-	assert.strictEqual( results.length, 2, "only 2 error" );
+	assert.expect( 9 );
+	assert.strictEqual( results.length, 4, "only 4 errors" );
 	assert.strictEqual( ruleId1, "@getify/proper-arrows/where", "ruleId" );
-	assert.strictEqual( messageId1, "noGlobal", "messageId" );
+	assert.strictEqual( messageId1, "noGlobal", "messageId1" );
 	assert.strictEqual( ruleId2, "@getify/proper-arrows/where", "ruleId" );
-	assert.strictEqual( messageId2, "noExport", "messageId" );
+	assert.strictEqual( messageId2, "noExport", "messageId2" );
+	assert.strictEqual( ruleId3, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId3, "noGlobal", "messageId3" );
+	assert.strictEqual( ruleId4, "@getify/proper-arrows/where", "ruleId" );
+	assert.strictEqual( messageId4, "noGlobalDeclaration", "messageId4" );
 } );

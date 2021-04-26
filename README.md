@@ -463,7 +463,7 @@ In this snippet, all three `=>` arrow functions remain anonymous because no name
 
 The **proper-arrows**/*where* rule restricts where in program structure `=>` arrow functions can be used.
 
-This rule can be configured to forbid `=>` arrow functions in the global/top-level-module scope (`"global"`), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
+This rule can be configured to forbid `=>` arrow functions in the global/top-level-module scope (`"global"`) (or `"global-declaration"` just for global arrow declarations), forbid `=>` arrow functions as object properties (`"property"`), and forbid `=>` arrow functions in `export` statements (`"export"`).
 
 To turn this rule on:
 
@@ -514,7 +514,7 @@ var People = {
     getData: (id,cb) => ajax(PEOPLE_URL,{ id },cb)
 };
 
-var onData = data => {
+const onData = data => {
     console.log(data);
 };
 
@@ -527,11 +527,13 @@ These usages of `=>` arrow functions are not helping the readability or behavior
 
 ### Rule Configuration
 
-The **proper-arrows**/*where* rule can be configured with three (non-exclusive) modes: `"global"`, `"property"`, and `"export"`.
+The **proper-arrows**/*where* rule can be configured with four (non-exclusive) modes: `"global"`, `"global-declaration"`, `"property"`, and `"export"`.
 
 **Note:** The default behavior is that all three modes are turned on for this rule. You must specifically configure each mode to disable it.
 
-* [`"global"`](#rule-where-configuration-global) (default: `true`) forbids `=>` arrow functions in the global/top-level-module scope.
+* [`"global"`](#rule-where-configuration-global) (default: `true`) forbids `=>` arrow functions in general expressions located in the global/top-level-module scope.
+
+* [`"global-declaration"`](#rule-where-configuration-global-declaration) (default: same as `global`) forbids `=>` "arrow function declarations" (e.g. `const foo = x => x * 2`) in the global/top-level-module scope.
 
 * [`"property"`](#rule-where-configuration-property) (default: `true`) forbids assigning `=>` arrow functions to object properties.
 
@@ -545,7 +547,35 @@ To configure this rule mode (on by default, set as `false` to turn off):
 "@getify/proper-arrows/where": [ "error", { "global": true, "trivial": false } ]
 ```
 
-When defining functions at the global/top-level-module scope, use a regular function declaration:
+For inline function expressions in the global/top-level-module scope, use the regular `function` declaration form to avoid errors:
+
+```js
+getResults({ query: "foo" },function onResults(results){
+    console.log(results);
+});
+```
+
+By contrast, this rule mode *would* report errors for:
+
+```js
+getResults({ query: "foo" },results => {
+    console.log(results);
+});
+```
+
+In this snippet, the `=>` arrow function is less obviously a function than the function expression form.
+
+##### Global Arrow Declarations
+
+A ["global arrow declaration"](#global-arrow-declaration) is specifically and only an arrow function expression initially assigned to a variable at the moment the variable is declared (in the global/top-level-module scope):
+
+```js
+const onData = data => {
+    console.log(data);
+};
+```
+
+The `global` rule mode includes forbidding this form of "declaration". Instead, the standard function declaration form should be used to avoid such errors:
 
 ```js
 function onData(data) {
@@ -553,15 +583,39 @@ function onData(data) {
 }
 ```
 
-By contrast, this rule mode *would* report errors for:
+However, the [`"global-declaration"`](#rule-where-configuration-global-declaration) mode **only** applies to these types of "declarations", not all arrow expressions, and it overrides this rule mode's treatment of such declarations.
+
+#### Rule `"where"` Configuration: `"global-declaration"`
+
+This rule mode by default mirrors the [`"global"`](#rule-where-configuration-global) rule mode, whatever value it's set or defaulted to. However, you can explicitly configure this rule mode to a different value as such:
+
+```json
+"@getify/proper-arrows/where": [ "error", { "global-declaration": true, "trivial": false } ]
+```
+
+This rule mode only controls reporting an error for a ["global arrow declaration"](#global-arrow-declaration), such as:
 
 ```js
-var onData = data => {
+const onData = data => {
     console.log(data);
 };
 ```
 
-In this snippet, the `=>` arrow function is less obviously a function than the function declaration form.
+To avoid such errors, use the regular `function` declaration form:
+
+```js
+function onData(data) {
+    console.log(data);
+}
+```
+
+Other global arrow expressions are unaffected by this particular rule mode; however, the separate [`"global"`](#rule-where-configuration-global) rule mode, which is on by default, controls *all* arrow function forms in the global/top-level-module scope.
+
+If `"global"` mode is explicitly turned off (via `false`), but this `"global-declaration"` is explicitly turned on (via `true`), ***ONLY*** ["global arrow declarations"](#global-arrow-declaration) will report errors.
+
+If `"global"` mode is on (by default, or set to `true` explicitly), but this `"global-declaration"` mode is explicitly turned off (via `false`), all other global/top-level-module scope arrow function expressions ***EXCEPT*** ["global arrow declarations"](#global-arrow-declaration) will report errors.
+
+However, if this `"global-declaration"` mode is not set explicitly, it will always mirror the value of the [`"global"`](#rule-where-configuration-global) rule mode, whether it is set explicitly or left to default.
 
 #### Rule `"where"` Configuration: `"property"`
 
