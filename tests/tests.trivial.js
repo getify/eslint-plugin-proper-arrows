@@ -21,6 +21,29 @@ var linterOptions = {
 			"@getify/proper-arrows/this": ["error","nested",{trivial:true,},],
 		},
 	},
+	trivialSimple: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: {
+			"@getify/proper-arrows/this": ["error","nested",{trivial:false,},],
+		},
+	},
+	trivialExtended: {
+		parserOptions: { ecmaVersion: 2015, },
+		rules: {
+			"@getify/proper-arrows/this": ["error","nested",{ trivial:false },],
+		},
+		settings: {
+			"proper-arrows/trivial": {
+				maxMemberDepth: 1,
+				maxObjectParamKeys: 1,
+				maxArrayParamKeys: 1,
+				allowNot: true,
+				allowDoubleNot: true,
+				allowBinaryExpression: true,
+				allowCallExpression: true,
+			}
+		}
+	},
 	trivialModuleDefault: {
 		parserOptions: { ecmaVersion: 2015, sourceType: "module", },
 		rules: {
@@ -47,7 +70,6 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 			f(g => h);
 			f(k => null);
 			f(h => void 0);
-			return { f: v => v };
 		}
 		f = r => r;
 		var g = s => s;
@@ -55,11 +77,54 @@ QUnit.test( "TRIVIAL (default): violating", function test(assert){
 
 	var results = eslinter.verify( code, linterOptions.trivialDefault );
 	var [{ ruleId, messageId, } = {},] = results || [];
-
 	assert.expect( 3 );
 	assert.strictEqual( results.length, 1, "only 1 error" );
 	assert.strictEqual( ruleId, "@getify/proper-arrows/this", "ruleId" );
 	assert.strictEqual( messageId, "noThisNested", "messageId" );
+} );
+
+QUnit.test( "TRIVIAL EXTENDED (default): violating", function test(assert){
+	var code = `
+		var f;
+		f(a => a.b);
+		f(b => !b);
+		f(c => !!c);
+		f(d => d + 1);
+		f(e => e + e);
+		f(g => g());
+		f(({h}) => h);
+		f(({h, i}) => h + i);
+		f(([j]) => j);
+		f(([j, k]) => j / k);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.trivialSimple );
+	assert.expect( 1 );
+	assert.strictEqual( results.length, 10, "every line failed" );
+} );
+
+QUnit.test( "TRIVIAL EXTENDED (enabled): violating", function test(assert){
+	var code = `
+		var f;
+		f(a => a.b);
+		f(b => !b);
+		f(c => !!c);
+		f(d => d + 1);
+		f(e => e + e);
+		f(g => g());
+		f(({h}) => h);
+		f(({h, i}) => h + i);
+		f(([j]) => j);
+		f(([j, k]) => j / k);
+	`;
+
+	var results = eslinter.verify( code, linterOptions.trivialExtended);
+	assert.expect( 5 );
+	assert.strictEqual( results.length, 2, "only two lines fail" );
+	assert.strictEqual( results[0].ruleId, "@getify/proper-arrows/this", "ruleId 0" );
+	assert.strictEqual( results[0].line, 10, "the first expected failed line" );
+	assert.strictEqual( results[1].ruleId, "@getify/proper-arrows/this", "ruleId 1" );
+	assert.strictEqual( results[1].line, 12, "the second expected failed line" );
 } );
 
 QUnit.test( "TRIVIAL (trivial:true): violating", function test(assert){

@@ -54,6 +54,44 @@ By default, **all rules ignore** these trivial functions. To **force a rule to c
 
 **Note:** The `"trivial"` option **will not necessarily report** trivial functions, but it will force trivial functions to be checked by the rule/mode in question.
 
+#### Configuring Triviality
+
+The default values for what constitutes a trivial function have some flexibility and can be altered via a `proper-arrows/trivial` settings entry in your `.eslintrc` file:
+
+```json
+{
+    "settings": {
+        "proper-arrows/trivial": {
+            "maxParamCount": 1,
+            "maxBlockStatements": 0, 
+            "maxMemberDepth": 0,
+            "maxObjectParamKeys": 0,
+            "maxArrayParamKeys": 0,
+            "allowVoid": true,
+            "allowNot": false,
+            "allowDoubleNot": false,
+            "allowBinaryExpression": false,
+            "allowedOperators": ["+", "-", "/", "*", "^", "%"],
+            "allowCallExpression": false,
+            "allowedCallArguments": 1
+        }
+    }
+}
+```
+
+- `maxParamCount`:  Maximum allowed arguments for the arrow function to be trivial.
+- `maxBlockStatements`: Maximum number of statements allowed inside a block function. Set to -1 to disallow empty block statements.
+- `maxMemberDepth`: Maximum depth of member elements on a variable (eg: a.b.c would require 3)
+- `maxObjectParamKeys`: Maximum allowed number of keys referenced in an object parameter (eg: `({a, b}) => {}` is 2)
+- `maxArrayParamKeys`: Maximum allowed number of indexes referenced in an array parameter (eg: `([a, b]) => {}` is 2)
+- `allowVoid`: Allow as a trivial `void 0` for a function body.
+- `allowNot`: Allow `!argument` as a function body.
+- `allowDoubleNot`: Allow `!!argument` as a function body (boolean coercion)
+- `allowBinaryExpression`: Allow two-part operators (eg: `n * n`) as a function body.
+- `allowedOperators`: Array of the allowed operators for binary expressions.
+- `allowCallExpression`: Allow invocation of functions (eg: `(s) => someFunction(s, 2)`)
+- `allowedCallArguments`: Number of allowed arguments in an invoked function for it to remain trivial.
+
 ## Enabling The Plugin
 
 To use **proper-arrows**, load it as a plugin into ESLint and configure the rules as desired.
