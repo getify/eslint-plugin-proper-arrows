@@ -5,7 +5,7 @@
 var path = require("path");
 
 var Linter = require("eslint").Linter;
-var eslinter = global.eslinter = new Linter();
+var eslinter = global.eslinter = new Linter({ configType: "eslintrc"});
 var properArrows;
 
 /* istanbul ignore next */
