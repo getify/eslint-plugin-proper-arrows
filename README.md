@@ -80,6 +80,39 @@ The available configuration presets to choose from:
 
 It's important to note that you can still override any of the preset rule definitions in your configuration. Think of these presets as convenience "defaults" that can still be customized.
 
+### Flat Config
+
+If you're using ESLint's newer flat config format, you can use the plugin's flat configuration preset:
+
+```js
+// eslint.config.js
+import properArrows from "@getify/eslint-plugin-proper-arrows";
+
+export default [
+    properArrows.flatConfigs["CONFIG-PRESET-NAME"], // i.e., "getify-says", etc
+    // ... other configs
+];
+```
+
+This will automatically load the plugin and apply the recommended preset rules configuration.
+The preset includes the same rules configuration as the traditional `"extends": ["plugin:@getify/proper-arrows/CONFIG-PRESET-NAME"]` format.
+
+You can still override any of the preset rules in your configuration after including the flat config:
+
+```js
+import properArrows from "@getify/eslint-plugin-proper-arrows";
+
+export default [
+    properArrows.flatConfigs["getify-says"],
+    {
+        rules: {
+            "@getify/proper-arrows/params": ["error", {"unused": "none"}],
+            // ... other rule overrides
+        }
+    }
+];
+```
+
 ### `.eslintrc.json`
 
 To load the plugin and enable its rules via a local or global `.eslintrc.json` configuration file:
@@ -94,6 +127,25 @@ To load the plugin and enable its rules via a local or global `.eslintrc.json` c
     "@getify/proper-arrows/where": ["error",{"global":true}],
     "@getify/proper-arrows/return": ["error",{"object":true}],
     "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
+}
+```
+
+For users of ESLint's newer flat config format, the configuration would look like this:
+
+```js
+import properArrows from "@getify/eslint-plugin-proper-arrows";
+
+{
+    plugins: {
+        "@getify/proper-arrows": properArrows
+    },
+    rules: {
+        "@getify/proper-arrows/params": ["error",{"unused":"trailing"}],
+        "@getify/proper-arrows/name": ["error",{"trivial":false}], 
+        "@getify/proper-arrows/where": ["error",{"global":true}],
+        "@getify/proper-arrows/return": ["error",{"object":true}],
+        "@getify/proper-arrows/this": ["error","always",{"no-global":true}]
+    }
 }
 ```
 
